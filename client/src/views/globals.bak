@@ -1,0 +1,64 @@
+
+import { Subject } from 'rxjs';
+// import { Subject, Observable } from 'rxjs';
+
+exports.listIconClick = new Subject();
+
+// var barcode = class {
+//     constructor() {
+
+//         this.ws = WebSocket;
+//         this.settings = {};
+
+//         let _settings = localStorage.getItem('barcode_settings');
+
+//         if ( _settings ) {
+//             this.settings = JSON.parse(_settings)
+//         } else {
+//             this.settings = {
+//                 //show_autocomplete_list: true
+//                 autoprintReceipt: true,
+//                 autoprintJoborder: true,
+//                 autoprintBarcode: true,
+//                 barcodePrinter: '',
+//                 receiptPrinter: '',
+//                 labelsize: 0,
+//                 leftMargin: 0,
+//                 topMargin: 0,
+//                 printMethod: 0,
+//                 printers: [],
+//                 websocketServerIP: "127.0.0.1",
+//                 show_autocomplete_list: true
+//             }
+            
+//             localStorage.setItem('barcode_settings', JSON.stringify(this.settings))
+
+//         }
+//     }
+
+//     createObservableSocket = (url = "ws://127.0.0.1:8181/websession") => {
+//         try {
+//             this.ws = new WebSocket(url);
+//             return new Observable(observer => {
+//                 this.ws.onmessage = event => observer.next(event.data);
+//                 this.ws.onerror = event => observer.error(event);
+//                 this.ws.onclose = () => observer.complete();
+//                 this.ws.onopen = event => {
+//                     console.log(event);
+//                     this.send({ "text": { "function": "get printers" } })
+//                 };
+
+//                 return () => this.ws.close();
+//             });
+
+//         } catch (ex) {
+//             console.log(ex);
+//         } 
+//     }
+
+//     send(message) {
+//         this.ws.send(JSON.stringify(message));
+//     }
+// }
+
+// console.log(barcode);
