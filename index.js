@@ -24,6 +24,8 @@ const sysmex_urine  = require('./analyzers/sysmex_urine');
 const dimension     = require('./analyzers/dimension');
 
 // 10.16.6.15
+// server user: tarqeem
+// server password: asd
 
 ////////////////////////////////////////////////////////////
 ////////////////////////// TODO ////////////////////////////
