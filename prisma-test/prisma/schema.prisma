@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model LabEquipment {
+  id            Int     @id(map: "PK__Lab_Equi__3213E83FFB97A30B")
+  EquipmentID   Int?
+  EquipmentName String? @db.NVarChar(255)
+
+  @@map("Lab_Equipment")
+}
+
+model LabOrder {
+  id                Int       @id(map: "PK__IPOP_LAB__3213E83F763FDC7E")
+  OrderID           Int?
+  LabNumber         String?   @db.NVarChar(255)
+  HospitalCode      String?   @db.NVarChar(255)
+  BillNo            String?   @db.NVarChar(255)
+  PatientID         Int?
+  PatientName       String?   @db.NVarChar(255)
+  DOB               DateTime  @db.DateTimeOffset
+  Gendar            String?   @db.NVarChar(255)
+  ParameterId       Int?
+  DateTimeCollected DateTime? @db.DateTimeOffset
+  PatientType       String?   @db.NVarChar(255)
+  TestID            Int?      @default(dbgenerated("N''(NULL)''"), map: "DF__IPOP_LABO__TestI__412EB0B6")
+
+  @@map("IPOP_LABORDERS")
+}
+
+model LabParameterUnit {
+  id            Int     @id(map: "PK__Lab_Para__3213E83F97BDC401")
+  ParameterID   Int?
+  TestID        Int?
+  UnitId        Int?
+  ParameterName String? @db.NVarChar(255)
+  UnitName      String? @db.NVarChar(255)
+
+  @@map("Lab_Parameter_Unit")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LabResult {
+  id               Int?
+  OrderID          Int?
+  LabNumber        String?   @db.NVarChar(255)
+  ParameterID      Int?
+  TestID           Int?
+  UnitName         String?   @db.NVarChar(255)
+  Result           String?   @db.NVarChar(255)
+  DateTimeInserted DateTime? @db.DateTimeOffset
+  UserID           String?   @db.NVarChar(255)
+  Status           String?   @db.NVarChar(255)
+  HISDateTime      DateTime? @db.DateTimeOffset
+  EquipmentID      Int?
+  PatientType      String?   @db.NVarChar(255)
+
+  @@map("Lab_Results")
+  @@ignore
+}
+
+model LabTest {
+  id       Int     @id(map: "PK__Lab_Test__3213E83FB8269E1A")
+  TestID   Int?
+  TestName String? @db.NVarChar(255)
+  TestCode String? @db.NVarChar(255)
+
+  @@map("Lab_Test")
+}
+
+model LabUser {
+  id        Int     @id(map: "PK__Lab_User__3213E83FB6EFCD18")
+  UserID    String? @db.NVarChar(255)
+  UserName  String? @db.NVarChar(255)
+  Title     String? @db.NVarChar(255)
+  Possition String? @db.NVarChar(255)
+
+  @@map("Lab_User")
+}
