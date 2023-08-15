@@ -15,6 +15,8 @@ module.exports = (connection) => {
     router.get('/test', controller.test);  
 
     router.get('/results/:labNumber/:orderId', controller.resultsByLabOrder);
+    
+    router.get('/order/:labNumber/:orderId', controller.orderByLabOrder);
 
     // router.get('/:table/:limit', controller.table);  
     // router.get('/:table', controller.upload);  

@@ -234,6 +234,29 @@ module.exports = (connection) => {
             res.json(savedTestLines);
         },
 
+        orderByLabOrder: async (req, res) => { 
+            
+            // http://127.0.0.1:8003/api/sgh/results/15891/229425
+            let LabNumber = req.params.labNumber; // 15891
+            let OrderID = req.params.orderId; // 229425
+
+            let query  = `select * from IPOP_LABORDERS where OrderID = ${OrderID} and LabNumber = ${LabNumber}`;
+            let savedTestLines = await connection.query(query, { type: Sequelize.QueryTypes.SELECT});
+
+            // savedTestLines = savedTestLines.map( x => ({
+            //     id: x.id,
+            //     ParameterName: Parameters.find(p => p.ParameterID == x.ParameterID )?.ParameterName,
+            //     ParameterId: x.ParameterID,
+            //     LabNumber: x.LabNumber,
+            //     OrderID: x.OrderID,
+            //     Result: x.Result,
+            //     HISDateTime: x.HISDateTime,
+            //     UnitName: x.UnitName
+            // }))
+
+            res.json(savedTestLines);
+        },
+
         labNumbersByLabID: async (req, res) => { 
         
             // let dateFrom = moment().format('YYYY-MM-DD');
