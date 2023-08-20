@@ -2,7 +2,6 @@ module.exports = {
     'apiServerIp': '10.16.6.13:8080',
     'delayInDays': '10.16.6.13:8080',
 	'database00': 'mongodb://localhost:27017/host_hub',
-    'database': 'mongodb://tarqeem:4063406a@ds135413.mlab.com:35413/sgh',
     'chars': {
         SOH: String.fromCharCode(1),
         STX: String.fromCharCode(2),
