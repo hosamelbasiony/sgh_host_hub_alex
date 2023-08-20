@@ -13,7 +13,7 @@ const AstmSocketReader  = require('./astm/reader');
 const AstmSocketParser  = require('./astm/parser');
 const { CLOSING } = require('ws');
 const { Console } = require('console');
-const { save } = require('./db');
+const { save, saveResults } = require('./db');
 
 let inDir = path.resolve(process.cwd(), 'log', 'C311_in.txt');
 let resDir = path.resolve(process.cwd(), 'log', 'C311_out.txt'); 
@@ -186,7 +186,7 @@ let parse = ( msg, separator = CR ) => {
         }
     }
 
-    if (  msgType == "result" ) save(device, result);
+    if (  msgType == "result" ) saveResults(device, result);
 }
 
 exports.start = (io, conn) => {

@@ -99,6 +99,88 @@ const saveResult = async (device, result) => {
     }
 }
 
+const saveResults = async (device, result) => {
+
+    // if( Math.random() > 0.5 ) return;
+
+    try {
+
+        // io.emit("e411_result", { data: result });
+
+        console.log(JSON.stringify(result, undefined, 2));
+
+        let resultList = result;
+        let deviceId = device.id;
+
+        let LabNumber = resultList.sampleid;
+
+        let response = await axios.get(`${config.apiServerIp}/api/Lab/GetLabOrders/LastDays/${config.delayInDays}/LabNumber/${LabNumber}`)
+        let retData = response.data;
+
+        let linesToUpoad = [];
+
+        for (let line of resultList.lines) {
+
+            if (line.parameterId == null) {
+                line.parameterId = 0;
+                line.parameter_id = 0;
+
+
+                const filteredCodes = await global.connection.models.deviceCode.findAll({
+                    where: {
+                        upload: true,
+                        deviceId: device.id,
+                        hostCode: line.code
+                    }
+                });
+
+                for (let filteredCode of filteredCodes) {
+                    line.parameterId = filteredCode.paramId;
+                    line.parameter_id = filteredCode.paramId;
+                    // global.emit("results", result);
+                }
+            }
+
+            // let response = await axios.post(`${config.apiServerIp}/api/Lab/GetLabOrders/LabNumber/${LabNumber}`, result)
+            // let retData = response.data;
+
+            let selectedLine = retData.find(x => x.parameterId == line.parameterId);
+
+            if ( selectedLine ) {  
+
+                // line.unit = line.unit || '';
+                // let PatientType = line.PatientType;
+                // let OrderID = line.OrderID;
+                // let TestID = line.TestID;
+
+                linesToUpoad.push({
+                    "OrderID": selectedLine.OrderID,
+                    "LabNumber": LabNumber,
+                    "ParameterID": selectedLine.parameterId,
+                    "TestID": selectedLine.TestID,
+                    "UnitName": line.unit || '',
+                    "Result": line.result.toString(),
+                    "EquipmentID": 26,
+                    "UserID": "10137",
+                    "Status": true,
+                    "PatientType": selectedLine.PatientType
+                });
+            }
+
+        }
+
+        // linesToUpoad
+        // 10.16.6.13:8080/api/Lab/UpdateOrderResult
+
+        response = await axios.post(`${config.apiServerIp}/api/Lab/UpdateOrderResult`, linesToUpoad)
+        retData = response.data;
+        console.log(retData);
+
+    } catch (ex) {
+        console.log(ex.stack);
+    }
+}
+
 const reqCodes = async (device, LabNumber) => {
 
     const analyzerParamList = await global.connection.models.deviceCode.findAll({
@@ -150,5 +232,6 @@ const reqCodes = async (device, LabNumber) => {
 module.exports = {
     save,
     saveResult,
+    saveResults,
     reqCodes
 }
