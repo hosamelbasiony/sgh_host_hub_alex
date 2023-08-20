@@ -86,6 +86,20 @@ app.get("/ping", (req, res) => {
     res.json({data: "pong"})
 })
 
+app.get("/api/ping", (req, res) => {
+    const { exec } = require('child_process');
+    let yourscript = exec('sh upgrade2.sh',
+        (error, stdout, stderr) => {
+            console.log(stdout);
+            console.log(stderr);
+            if (error !== null) {
+                console.log(`exec error: ${error}`);
+            }
+        });
+
+    res.json({data: "pong"})
+})
+
 app.get('*', (req, res) => res.send("No such route"));
 
 let server;
