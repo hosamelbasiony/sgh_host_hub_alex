@@ -72,9 +72,23 @@ app.use('/api/devices', require('./routes/devices')(connection));
 app.use('/api/scheduling', require('./routes/scheduling')(connection));
 
 
+app.get("/test", (req, res) => {
+    const { exec } = require('child_process');
+    let yourscript = exec('sh test.sh > null',
+        (error, stdout, stderr) => {
+            console.log(stdout);
+            console.log(stderr);
+            if (error !== null) {
+                console.log(`exec error: ${error}`);
+            }
+        });
+
+    res.json({data: "test"})
+})
+
 app.get("/ping", (req, res) => {
     const { exec } = require('child_process');
-    let yourscript = exec('sh upgrade.sh',
+    let yourscript = exec('sh upgrade.sh > null',
         (error, stdout, stderr) => {
             console.log(stdout);
             console.log(stderr);
@@ -88,7 +102,7 @@ app.get("/ping", (req, res) => {
 
 app.get("/pong", (req, res) => {
     const { exec } = require('child_process');
-    let yourscript = exec('sh upgrade2.sh',
+    let yourscript = exec('sh upgrade2.sh > null',
         (error, stdout, stderr) => {
             console.log(stdout);
             console.log(stderr);
