@@ -71,13 +71,28 @@ app.use('/api/parameters', require('./routes/parameters')(connection));
 app.use('/api/devices', require('./routes/devices')(connection));
 app.use('/api/scheduling', require('./routes/scheduling')(connection));
 
+
+app.get("/ping", (req, res) => {
+    const { exec } = require('child_process');
+    let yourscript = exec('sh upgrade.sh',
+        (error, stdout, stderr) => {
+            console.log(stdout);
+            console.log(stderr);
+            if (error !== null) {
+                console.log(`exec error: ${error}`);
+            }
+        });
+
+    res.json({data: "pong"})
+})
+
 app.get('*', (req, res) => res.send("No such route"));
 
 let server;
 
 connection.sync().then( async() => {
 
-    await sghConnection.sync({force: 0});
+    // await sghConnection.sync({force: 0});
 
     global.connection = connection;
     global.sgh = sghConnection;

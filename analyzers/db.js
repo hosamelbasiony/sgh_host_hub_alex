@@ -100,22 +100,20 @@ const saveResult = async (device, result) => {
 }
 
 const saveResults = async (device, result) => {
-
-    // if( Math.random() > 0.5 ) return;
-
     try {
 
-        // io.emit("e411_result", { data: result });
+        // io.emit("result", { device, result });
 
         console.log(JSON.stringify(result, undefined, 2));
 
         let resultList = result;
-        let deviceId = device.id;
 
         let LabNumber = resultList.sampleid;
 
         let response = await axios.get(`${config.apiServerIp}/api/Lab/GetLabOrders/LastDays/${config.delayInDays}/LabNumber/${LabNumber}`)
         let retData = response.data;
+
+        console.log(JSON.stringify(retData, null, 3));
 
         let linesToUpoad = [];
 
@@ -140,9 +138,6 @@ const saveResults = async (device, result) => {
                     // global.emit("results", result);
                 }
             }
-
-            // let response = await axios.post(`${config.apiServerIp}/api/Lab/GetLabOrders/LabNumber/${LabNumber}`, result)
-            // let retData = response.data;
 
             let selectedLine = retData.find(x => x.parameterId == line.parameterId);
 
