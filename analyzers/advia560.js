@@ -59,6 +59,8 @@ const server = net.createServer( (s) => {
     socket.on ( 'error', err => console.log(`Socket error`, err.stack) );
     
     socket.on('data', data => {
+        
+        socket.send(ACK);
 
         data = data.toString();
 
