@@ -115,7 +115,7 @@ const saveResults = async (device, result) => {
         let response = await axios.get(`${config.apiServerIp}/api/Lab/GetLabOrders/LastDays/${config.delayInDays}/LabNumber/${LabNumber}`)
         let retData = response.data;
 
-        console.log(JSON.stringify(retData, null, 3));
+        console.log("*** LAB ORDER DATA ***", JSON.stringify(retData, null, 3));
 
         let linesToUpoad = [];
 
