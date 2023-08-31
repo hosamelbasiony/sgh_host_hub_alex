@@ -42,6 +42,13 @@ module.exports = (connection) => {
         }, 
 
         params: async (req, res) => {
+            
+            let raw = await fs.readFileSync(`./params.json`);
+
+            res.json({ tests: [], parameters: JSON.parse(raw) });
+        },
+
+        params0: async (req, res) => {
             const tests = await connection.query(`SELECT * FROM Lab_Test`, { type: Sequelize.QueryTypes.SELECT});
             const parameters = await connection.query(`SELECT * FROM Lab_Parameter_Unit`, { type: Sequelize.QueryTypes.SELECT});
             res.json({ tests, parameters });

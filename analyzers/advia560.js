@@ -99,7 +99,8 @@ let parse = ( buffer, separator = CR ) => {
         lines: [],
     };
     
-    let resultHeaders = ["WBC", "LYM", "NEU", "MON", "EOS", "BAS", "LY%", "NE%", "MO%", "EO%", "BA%", "RBC", "HGB", "HCT", "MCV", "MCH", "MCHC", "RDWc", "RDWs", "PLT", "MPV"];
+    let resultHeaders = ["WBC", "LYM", "NEU", "MON", "EOS", "BAS", "LY%", "NE%", "MO%", "EO%", "BA%", "RBC", "HGB", "HCT", "MCV", 
+    "MCH", "MCHC", "RDWc", "RDWs", "PLT", "MPV"];
 
     for( let line of rawLines ) {
         if (line.includes("Sample ID:")) {

@@ -66,7 +66,7 @@ app.use(morgan('dev'));
 
 app.use('/api/auth', require('./routes/auth')(connection));
 app.use('/api/user', require('./routes/users')(connection));
-// app.use('/api/sgh', require('./routes/sgh')(sghConnection));
+app.use('/api/sgh', require('./routes/sgh')(sghConnection));
 app.use('/api/parameters', require('./routes/parameters')(connection));
 app.use('/api/devices', require('./routes/devices')(connection));
 app.use('/api/scheduling', require('./routes/scheduling')(connection));

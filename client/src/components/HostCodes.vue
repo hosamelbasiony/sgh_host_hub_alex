@@ -239,6 +239,7 @@ export default {
       });
     },
     items() {
+      console.log("****PARAMS****", this.params)
       return this.params.parameters.map((entry) => {
         // const Description = entry.Description.length > this.descriptionLimit
         //   ? entry.Description.slice(0, this.descriptionLimit) + '...'
@@ -299,7 +300,10 @@ export default {
         );
         this.setBusy(false);
 
-        this.device.deviceCodes = [...this.device.deviceCodes, temp.data];
+        this.device.deviceCodes = [temp.data, ...this.device.deviceCodes];
+
+        this.editCode(temp.data);
+
         // this.parameters = [...this.parameters, JSON.parse(JSON.stringify(this.model))];
         setTimeout(() => (this.model = null), 10);
 
