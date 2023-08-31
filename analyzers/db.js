@@ -102,6 +102,8 @@ const saveResult = async (device, result) => {
 const saveResults = async (device, result) => {
     try {
 
+        console.log(JSON.stringify(result, null, 3))
+
         // io.emit("result", { device, result });
 
         console.log(JSON.stringify(result, undefined, 2));

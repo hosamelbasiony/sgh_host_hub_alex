@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "",
-    "password": null,
+    "password": "",
     "database": "sgh",
     "dialect": "sqlite",
     "storage": "sgh.sqlite",

@@ -1,0 +1,38 @@
+Serial No.:  S020735^M
+RecNo:  111
+Sample ID:   1
+Patient ID:  123
+Patient Name:         ^M
+Mode:   Human
+Doctor:
+Birth(ymd):
+Sex:    Male
+Test date(ymd):      20230817
+Test time(hm):       095200
+Param   Flags        Value   Unit    [min-max]
+WBC     LL   0.09    10^3/uL [5.00-10.00]
+LYM  LL      0.00    10^3/uL      [1.30-4.00]
+NEU     LL      0.00    10^3/uL      [2.00-7.50]
+MON     LL      0.00 10^3/uL [0.15-0.70]
+EOS             0.00 10^3/uL [0.00-0.50]
+BAS          0.00    10^3/uL [0.00-0.15]
+LY%  LL      0.0     %       [21.0-40.0]
+NE%     LL      0.0  %       [40.0-75.0]
+MO%     LL      0.0     %    [3.0-7.0]
+EO%          0.0     %       [0.0-5.0]
+BA%             0.0  %       [0.0-1.5]
+RBC  LL      0.00    10^6/uL      [4.00-5.50]
+HGB     *       0.0     g/dL [12.0-17.4]
+HCT  **      ---     %       [36.0-52.0]
+MCV     **   ---     fL      [76.0-96.0]
+MCH     *       0.0  pg      [27.0-32.0]
+MCHC    **      ---  g/dL    [30.0-35.0]
+RDWc    **      ---  %       [0.0-16.0]
+RDWs LL      0.0     fL      [46.0-59.0]
+PLT  LL      2       10^3/uL [150-400]
+MPV     **   ---     fL      [8.0-15.0]
+Warnings:    xXWZ
+DiffImage    iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAvdJREFUeF7t>
+BasoImage       iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAA39JREFUeF7#>
+RBCImage     iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAABQJJREFUeF7t>
+                       
