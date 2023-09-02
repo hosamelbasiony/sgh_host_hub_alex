@@ -1,46 +1,5 @@
 <template>
   <div class="d-flex flex-row flex-grow-1 pa-2 mt-2">
-    <!-- <v-flex xs3 class="d-flex flex-grow-1 pa-2 mr-5">
-            <v-card
-            class="d-flex flex-row align-content-stretch mx-auto"
-            tile
-            style="flex: 1"
-            >
-            <v-list rounded class="flex-grow-1 mt-2">
-                <v-subheader>LOCATIONS</v-subheader>
-                <v-list-item-group v-model="item" color="primary">
-                <v-list-item
-                    v-for="(item, i) in items"
-                    :key="i"
-                    @click="hndlClick(item.action)"
-                >
-                    <v-list-item-icon>
-                    <v-icon v-text="item.icon"></v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                    <v-list-item-title v-text="item.text"></v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                </v-list-item-group>
-            </v-list>
-            </v-card>
-        </v-flex> -->
-
-    <!-- <v-card-text style="height: 100px; position: relative"> -->
-    <!-- <v-btn
-            absolute
-            dark
-            fab
-            bottom
-            left
-            color="pink"
-            @click.stop="drawer = !drawer"
-            class="mb--10"
-        >
-            <v-icon>mdi-plus</v-icon>
-        </v-btn> -->
-    <!-- </v-card-text> -->
-
     <v-navigation-drawer
       v-model="drawer"
       src="img/vbanner.jpg"

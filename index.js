@@ -133,7 +133,7 @@ connection.sync().then( async() => {
         // archi.start(io, connection, sghConnection);
         // ca600.start(io, connection, sghConnection);  
         // abl800.start(io, connection, sghConnection);
-        // e411.start(io, connection, sghConnection);
+        e411.start(io, connection, sghConnection);
         sysmex_urine.start(io, connection, sghConnection);
         
         // dimension.start(io, connection, sghConnection);

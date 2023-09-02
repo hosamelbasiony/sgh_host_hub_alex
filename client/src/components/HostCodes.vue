@@ -36,15 +36,6 @@
           class="ml-5 mb-5"
           hide-details
         ></v-checkbox>
-
-        <!-- <v-card-text>
-            <v-text-field
-              
-              type="time"
-              label="Reporting time"
-              required
-            ></v-text-field>
-          </v-card-text> -->
         <v-card-actions>
           <v-btn color="primary" text @click="closeDialog()">
             Close
@@ -60,14 +51,6 @@
       <v-card-title class="headline indigo darken-1">
         Host codes for {{ device.deviceName }}
       </v-card-title>
-      <!-- <v-card-text>
-        Explore hundreds of free API's ready for consumption! For more information visit
-        <a
-          class="grey--text text--lighten-3"
-          href="https://github.com/toddmotto/public-apis"
-          target="_blank"
-        >the Github repository</a>.
-      </v-card-text> -->
       <div class="d-flex flex-row">
         <v-card-text style="flex: 0 0 50%; margin-top: -1rem">
           <v-autocomplete
@@ -98,36 +81,6 @@
         </v-col>
       </div>
       <v-divider></v-divider>
-
-      <!-- <ul>
-        <li v-for="(param, index) in parameters" :key="index">{{ param.ParameterName }}</li>
-      </ul> -->
-
-      <!-- <v-expand-transition>
-        <v-list v-if="model" class="red lighten-3">
-          <v-list-item
-            v-for="(field, i) in fields"
-            :key="i"
-          >
-            <v-list-item-content>
-              <v-list-item-title v-text="field.value"></v-list-item-title>
-              <v-list-item-subtitle v-text="field.key"></v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-expand-transition> -->
-
-      <!-- <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          :disabled="!model"
-          color="grey darken-3"
-          @click="model = null"
-        >
-          Clear
-          <v-icon right>mdi-close-circle</v-icon>
-        </v-btn>
-      </v-card-actions> -->
     </v-card>
 
     <div class="d-flex flex-column flex-grow-1" red>
@@ -144,18 +97,7 @@
             </tr>
           </thead>
           <tbody>
-            <!-- createdAt: "2019-10-24T00:16:37.507Z"
-            deviceId: 3
-            download: true
-            hostCode: "WBC"
-            id: 6
-            paramId: "20"
-            updatedAt: "2019-10-24T00:17:00.692Z"
-            upload: true -->
-
-            <!-- <tr v-for="(param, index) in device.deviceCodes" :key="index"> -->
             <tr v-for="(param, index) in pages[page - 1]" :key="index">
-              <!-- <td style="cursor: pointer;"><v-icon color="indigo">mdi-pencil</v-icon></td> -->
               <td>{{ param.paramId }}</td>
               <td>{{ param.paramName }}</td>
               <td>
@@ -220,11 +162,10 @@ export default {
     parameters: [],
     device: {
       deviceName: "",
-      deviceCodes: [],
-    },
+      deviceCodes: []
+    }
   }),
 
-  // computed: mapGetters(['params']),
   computed: {
     ...mapGetters(["params"]),
 
