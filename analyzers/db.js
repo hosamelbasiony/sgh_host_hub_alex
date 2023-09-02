@@ -20,6 +20,8 @@ const save = (device, result) => {
 const saveResult = async (device, result) => {
 
     // if( Math.random() > 0.5 ) return;
+    console.log(JSON.stringify(result, null, 3));
+    if( !result ) return;
 
     try {
 
