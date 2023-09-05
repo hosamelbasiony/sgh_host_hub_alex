@@ -166,17 +166,33 @@ const saveResults = async (device, result) => {
 
                 console.log(JSON.stringify(selectedLine, null, 3));
 
+                // {
+                //     "orderID": 920405,
+                //     "labNumber": "864186",
+                //     "hospitalCode": "EG01",
+                //     "billNo": "CS41",
+                //     "patientId": 30000028,
+                //     "patientName": "ADAM HOSSAM ABDELHALIM ALI",
+                //     "dob": "2023-03-06T00:00:00",
+                //     "gendar": "Male",
+                //     "testID": 7930,
+                //     "parameterId": 22,
+                //     "dateTimeCollected": "2023-09-04T11:59:30.607",
+                //     "patientType": "OP"
+                //  }
+                 
+
                 linesToUpoad.push({
-                    "OrderID": selectedLine.OrderID,
+                    "OrderID": selectedLine.orderID,
                     "LabNumber": LabNumber,
                     "ParameterID": selectedLine.parameterId,
-                    "TestID": selectedLine.TestID,
-                    "UnitName": line.unit || '',
+                    "TestID": selectedLine.testID,
+                    "UnitName": '',
                     "Result": line.result.toString(),
                     "EquipmentID": 26,
                     "UserID": "10137",
                     "Status": true,
-                    "PatientType": selectedLine.PatientType
+                    "PatientType": selectedLine.patientType
                 });
             }
 
