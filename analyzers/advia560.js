@@ -60,7 +60,7 @@ const server = net.createServer( (s) => {
     
     socket.on('data', data => {
         
-        socket.send(ACK);
+        socket.write(ACK);
 
         data = data.toString();
 
