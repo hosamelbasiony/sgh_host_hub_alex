@@ -190,7 +190,7 @@ const saveResults = async (device, result) => {
                     "UnitName": selectedLine.unitName? selectedLine.unitName:'',
                     "Result": line.result.toString(),
                     "EquipmentID": 26,
-                    "UserID": "10137",
+                    "UserID": "100047",
                     "Status": true,
                     "PatientType": selectedLine.patientType
                 });
