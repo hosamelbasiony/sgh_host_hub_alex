@@ -108,7 +108,7 @@ const saveResults = async (device, result) => {
 
         // io.emit("result", { device, result });
 
-        console.log(JSON.stringify(result, undefined, 2));
+        console.log("UPLOADING => ", JSON.stringify(result, undefined, 2));
 
         let resultList = result;
 
@@ -117,7 +117,7 @@ const saveResults = async (device, result) => {
         let response = await axios.get(`${config.apiServerIp}/api/Lab/GetLabOrders/LastDays/${config.delayInDays}/LabNumber/${LabNumber}`)
         let retData = response.data;
 
-        console.log("*** LAB ORDER DATA ***", JSON.stringify(retData, null, 3));
+        // console.log("*** LAB ORDER DATA ***", JSON.stringify(retData, null, 3));
 
         let linesToUpoad = [];
 
