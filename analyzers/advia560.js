@@ -19,8 +19,8 @@ let inDir = path.resolve(process.cwd(), 'log', 'C311_in.txt');
 let resDir = path.resolve(process.cwd(), 'log', 'C311_out.txt'); 
 
 let device = {
-    _id: '1',
-    id: 1,
+    _id: '16',
+    id: 16,
     name: 'Advia560', 
     codes: []
 };
@@ -91,8 +91,8 @@ let parse = ( buffer, separator = CR ) => {
         sampleId: "",
         sampleid: "",
         _histogram: {},
-        devid: 1,
-        deviceid: 1,
+        devid: 16,
+        deviceid: 16,
         devicename: "Advia560",
         deviceName: "Advia560",
         user: "Advia560",
