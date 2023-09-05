@@ -142,6 +142,20 @@ const saveResults = async (device, result) => {
             }
 
             let selectedLine = retData.find(x => x.parameterId == line.parameterId);
+            // {
+            //     "orderID": 920405,
+            //     "labNumber": "864186",
+            //     "hospitalCode": "EG01",
+            //     "billNo": "CS41",
+            //     "patientId": 30000028,
+            //     "patientName": "ADAM HOSSAM ABDELHALIM ALI",
+            //     "dob": "2023-03-06T00:00:00",
+            //     "gendar": "Male",
+            //     "testID": 7930,
+            //     "parameterId": 20,
+            //     "dateTimeCollected": "2023-09-04T11:59:30.607",
+            //     "patientType": "OP"
+            // },
 
             if ( selectedLine ) {  
 
@@ -149,6 +163,8 @@ const saveResults = async (device, result) => {
                 // let PatientType = line.PatientType;
                 // let OrderID = line.OrderID;
                 // let TestID = line.TestID;
+
+                console.log(JSON.stringify(selectedLine, null, 3));
 
                 linesToUpoad.push({
                     "OrderID": selectedLine.OrderID,
