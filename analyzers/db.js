@@ -108,8 +108,6 @@ const saveResults = async (device, result) => {
 
         // io.emit("result", { device, result });
 
-        console.log("UPLOADING => ", JSON.stringify(result, undefined, 2));
-
         let resultList = result;
 
         let LabNumber = resultList.sampleid;
@@ -170,6 +168,8 @@ const saveResults = async (device, result) => {
 
         // linesToUpoad
         // 10.16.6.13:8080/api/Lab/UpdateOrderResult
+
+        console.log("UPLOADING => ", JSON.stringify(linesToUpoad, undefined, 2));
 
         response = await axios.post(`${config.apiServerIp}/api/Lab/UpdateOrderResult`, linesToUpoad)
         retData = response.data;
