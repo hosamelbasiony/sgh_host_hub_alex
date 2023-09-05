@@ -49,33 +49,35 @@ export default {
     try {
       let ret = await axios.get(`${process.env.VUE_APP_CODES_API_URL}`);
       let data = ret.data;
-      data.parameters = data.parameters.map(x => ({
+
+      data.parameters = data.map(x => ({
         ParameterID: x.parameterID,
         TestID: x.testID,
         UnitId: x.unitId,
-        ParameterName: x.parameterName,
-        UnitName: x.unitName
+        ParameterName: "",
+        UnitName: ""
       }));
+      
       this.setParams(data);
     } catch (error) {
-      axios
-        //   .get(`${process.env.VUE_APP_CODES_API_URL}`)
-        .get(`${process.env.VUE_APP_API_URL}sgh/params`)
-        .then(ret => {
-          let data = ret.data;
-          data.parameters = data.parameters.map(x => ({
-            ParameterID: x.parameterID,
-            TestID: x.testID,
-            UnitId: x.unitId,
-            ParameterName: x.parameterName,
-            UnitName: x.unitName
-          }));
-          this.setParams(data);
-        })
-        .catch(ex => {
-          this.setParams({ tests: [], parameters: [] });
-          console.log(ex);
-        });
+      console.error(error);
+      // axios
+      //   .get(`${process.env.VUE_APP_API_URL}sgh/params`)
+      //   .then(ret => {
+      //     let data = ret.data;
+      //     data.parameters = data.parameters.map(x => ({
+      //       ParameterID: x.parameterID,
+      //       TestID: x.testID,
+      //       UnitId: x.unitId,
+      //       ParameterName: x.parameterName,
+      //       UnitName: x.unitName
+      //     }));
+      //     this.setParams(data);
+      //   })
+      //   .catch(ex => {
+      //     this.setParams({ tests: [], parameters: [] });
+      //     console.log(ex);
+      //   });
     }
 
     axios

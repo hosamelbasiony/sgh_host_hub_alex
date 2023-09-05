@@ -10,7 +10,7 @@ const { Op }            = require('sequelize');
 const AstmSocketReader  = require('./astm/reader');
 const AstmSocketParser  = require('./astm/parser');
 
-const { saveResult, reqCodes }      = require('./db');
+const { saveResults, reqCodes }      = require('./db');
 
 let inDir = path.resolve(process.cwd(), 'log', 'e411_in.txt');
 let resDir = path.resolve(process.cwd(), 'log', 'e411_out.txt'); 
@@ -207,7 +207,7 @@ const server = net.createServer( (socket) => {
         console.log(sid+ " to request");
         toRequesition = [...toRequesition, sid]
     });
-    parser.on( 'results', results => saveResult(results) );
+    parser.on( 'results', results => saveResults(results) );
     parser.on( 'startDownload', _ => {
         console.log('startDownload' + JSON.stringify(toRequesition, undefined, 4));
         if ( toRequesition.length ) {
@@ -223,8 +223,6 @@ const saveResult0 = async result  => {
 	// if( Math.random() > 0.5 ) return;
 
     try {
-
-        //console.log('saveResult', result);
 
         io.emit("e411_result", { data: result });
 
