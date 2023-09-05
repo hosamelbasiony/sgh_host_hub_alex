@@ -187,7 +187,7 @@ const saveResults = async (device, result) => {
                     "LabNumber": LabNumber,
                     "ParameterID": selectedLine.parameterId,
                     "TestID": selectedLine.testID,
-                    "UnitName": '',
+                    "UnitName": selectedLine.unitName? selectedLine.unitName:'',
                     "Result": line.result.toString(),
                     "EquipmentID": 26,
                     "UserID": "10137",
