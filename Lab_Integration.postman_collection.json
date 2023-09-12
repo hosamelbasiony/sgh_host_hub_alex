@@ -1,0 +1,101 @@
+{
+	"info": {
+		"_postman_id": "58e4eb3b-b341-4133-b4e5-156175c458dd",
+		"name": "Lab_Integration",
+		"description": "This Integration Transfer the Lab Orders from HIS To LLMW (Lab Local Middleware) then over EndPoint Lab Machine Invoke an Endpoint to push the result to HIS\n\nFor More Details Please check th Swagger Documentation Throw This Link :\n\n[http://10.16.6.13:8080/swagger/index.html]()",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "11654410"
+	},
+	"item": [
+		{
+			"name": "Get All Lab Orders",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabOrders"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Orders By LabNumber",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabOrders/LabNumber/243746"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Orders By OrderID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabOrders/OrderID/64605"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Orders Baes on Last Days and LabNumber",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabOrders/LastDays/5/LabNumber/243746"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Equipment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabEquipment"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Paramter Unit",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabParamterUnit"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab Test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabTest"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lab User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "10.16.6.13:8080/api/Lab/GetLabUser"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Order Result",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"orderID\": 0,\r\n    \"labNumber\": \"string\",\r\n    \"parameterID\": 0,\r\n    \"testID\": 0,\r\n    \"unitName\": \"string\",\r\n    \"result\": \"string\",\r\n    \"equipmentID\": 0,\r\n    \"userID\": \"string\",\r\n    \"status\": true,\r\n    \"patientType\": \"string\"\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "10.16.6.13:8080/api/Lab/UpdateOrderResult"
+			},
+			"response": []
+		}
+	]
+}

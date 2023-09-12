@@ -109,7 +109,7 @@ export default {
 
     activeBtn: true,
     valid: true,
-    id: "", //349136,
+    id: "", // "6965", // "715037", //349136,
     orders: [],
 
     dropdown_font: ["Arial", "Calibri", "Courier", "Verdana"],
@@ -206,9 +206,10 @@ export default {
       let tests = [];
       let Tests = [];
       for (let testId of order.tests.map(x => x.TestID)) {
-        // let testId = test.TestID;
         if (!Tests.includes(testId)) Tests = [...Tests, testId];
       }
+
+      console.log("***ALL TESTS***", this.tests);
 
       for (let testId of Tests) {
         tests = [
@@ -218,8 +219,8 @@ export default {
       }
 
       console.log(order);
-      console.log(Tests);
-      console.log(tests);
+      console.log("**Tests***", Tests);
+      console.log("**tests***", tests);
 
       msg.text.line1 = tests.length + "# ";
       if (tests[0]) msg.text.line1 += tests[0];
@@ -264,7 +265,7 @@ export default {
       // let d = new Date(patient.DateTimeCollected.toString());
       // msg.text.date = d.toDateString() + ' ' + d.getHours() + ':' + d.getMinutes();
 
-      console.log(msg);
+      console.log("*** TO PRINT ***", msg);
       this.barcode.send(msg);
     },
 
@@ -342,9 +343,11 @@ export default {
   },
 
   async created() {
-    const ret = await axios.get(`${process.env.VUE_APP_API_URL}sgh/tests`);
+    // let ret = await axios.get(`${process.env.VUE_APP_API_URL}sgh/tests`);
+    // this.tests = ret.data;
+   
+    let ret = await axios.get(`${process.env.UE_APP_TESTS_API_URL}`);
     this.tests = ret.data;
-    // console.log(tests);
 
     window["tests"] = this.tests;
 

@@ -47,7 +47,7 @@ export default {
     // axios.get(`${process.env.VUE_APP_API_URL}sgh/params`)
 
     try {
-      let ret = await axios.get(`${process.env.VUE_APP_CODES_API_URL}`);
+      let ret = await axios.get(`${process.env.VUE_APP_PARAMS_API_URL}`);
       let data = ret.data;
 
       data.parameters = data.map(x => ({

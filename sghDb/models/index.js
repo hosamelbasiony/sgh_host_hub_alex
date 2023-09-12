@@ -17,12 +17,12 @@ module.exports = (env) => {
     
 
   const config = {
-    "username": 'LabUser',
-    "password": 'LAB@987',
-    "server": '10.16.12.18',
-    "host": "10.16.12.18",
-    "database": 'LabIntegration',  
-    "dialect": "mssql", 
+    // "username": 'LabUser',
+    // "password": 'LAB@987',
+    // "server": '10.16.12.18',
+    // "host": "10.16.12.18",
+    // "database": 'LabIntegration',  
+    // "dialect": "mssql", 
     
     // https://my.gearhost.com/Account/Login
     // hosam.el.basiony@gmail.com dev@dmin    
@@ -32,11 +32,11 @@ module.exports = (env) => {
     // "database": "SGH", 
     // "dialect": "mssql",  
 
-    // "username": "sa",
-    // "password": "Secret1234",
-    // "host": "127.0.0.1",
-    // "database": "SGH", 
-    // "dialect": "mssql", 
+    "username": "sa",
+    "password": "Secret1234",
+    "host": "127.0.0.1",
+    "database": "SGH", 
+    "dialect": "mssql", 
     
     "options": {
         encrypt: false // Use this if you're on Windows Azure
