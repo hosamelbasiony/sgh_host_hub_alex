@@ -1,4 +1,5 @@
 module.exports = {
+    'userId': '100000',
     'apiServerIp': 'http://10.16.6.13:8080',
     'delayInDays': 3000,
 	'database00': 'mongodb://localhost:27017/host_hub',

@@ -63,7 +63,7 @@ const saveResult = async (device, result) => {
             let results = await global.sgh.query(query, { type: Sequelize.QueryTypes.SELECT });
 
             let Status = 0; // from tarqeem
-            let UserID = 10137; // from tarqeem
+            let UserID = config.userId; //10137; // from tarqeem
             let EquipmentID = 26; //deviceId; // from tarqeem added manually    
 
             line.unit = line.unit || '';

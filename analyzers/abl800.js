@@ -10,6 +10,7 @@ const { Op }            = require('sequelize');
 const AstmSocketReader  = require('./astm/reader');
 const AstmSocketParser  = require('./astm/parser');
 // const Device            = require('../models/device');
+const config      = require('../config');
 
 let inDir = path.resolve(process.cwd(), 'log', 'abl800_in.txt');
 let resDir = path.resolve(process.cwd(), 'log', 'abl800_out.txt'); 
@@ -243,7 +244,7 @@ const saveResult = async result  => {
         let resultList = result;
         let deviceId = device.id;
 
-        let userId = 10137; // req.params.userId;
+        let userId = config.userId; //10137; // req.params.userId;
         
         let LabNumber = resultList.sampleid;
 

@@ -11,7 +11,7 @@ const AstmSocketReader  = require('./astm/reader');
 const AstmSocketParser  = require('./astm/parser');
 // const Device            = require('../models/device');
 // const database          = require ('./mssql');
-
+const config      = require('../config');
 
 let inDir = path.resolve(process.cwd(), 'log', 'e411_in.txt');
 let resDir = path.resolve(process.cwd(), 'log', 'e411_out.txt'); 
@@ -314,7 +314,7 @@ const saveResult = async result  => {
         let resultList = result;
         let deviceId = device.id;
 
-        let userId = 10137; // req.params.userId;
+        let userId = config.userId; //10137; // req.params.userId;
         
         let LabNumber = resultList.sampleid;
 

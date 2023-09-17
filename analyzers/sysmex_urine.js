@@ -7,6 +7,7 @@ const fileSystem        = require("fs");
 const Sequelize         = require('sequelize');
 const { Op }            = require('sequelize');
 
+const config      = require('../config');
 const AstmSocketReader  = require('./astm/reader');
 const AstmSocketParser  = require('./astm/parser');
 // const Device            = require('../models/device');
@@ -301,7 +302,7 @@ const saveResult = async result  => {
         let resultList = result;
         let deviceId = device.id;
 
-        let userId = 10137; // req.params.userId;
+        let userId = config.userId; //10137; // req.params.userId;
         
         let LabNumber = resultList.sampleid;
 
