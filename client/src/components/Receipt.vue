@@ -313,11 +313,11 @@ export default {
           /////////////////////////////////////////////////////////////////////////////////////////
           // const getRandomInt = (min, max) => Math.floor((Math.random() * Math.floor(max-min))+min);
 
-          // let idx = getRandomInt(0, this.params.tests.length - 1);
-          // test.TestID = this.params.tests[idx].TestID;
+          // let idx = getRandomInt(0, this.tests.length - 1);
+          // test.TestID = this.tests[idx].TestID;
           /////////////////////////////////////////////////////////////////////////////////////////
 
-          let filtered = this.params.tests.filter(x => x.TestID == test.TestID);
+          let filtered = this.tests.filter(x => x.TestID == test.TestID);
 
           if (filtered.length) test.TestName = filtered[0].TestName;
           else test.TestName = test.TestID;
@@ -346,7 +346,7 @@ export default {
     // let ret = await axios.get(`${process.env.VUE_APP_API_URL}sgh/tests`);
     // this.tests = ret.data;
    
-    let ret = await axios.get(`${process.env.UE_APP_TESTS_API_URL}`);
+    let ret = await axios.get(`${process.env.VUE_APP_TESTS_API_URL}`);
     this.tests = ret.data;
 
     window["tests"] = this.tests;
