@@ -205,7 +205,7 @@ export default {
 
       let tests = [];
       let Tests = [];
-      for (let testId of order.tests.map(x => x.TestID)) {
+      for (let testId of order.tests.map(x => x.testID)) {
         if (!Tests.includes(testId)) Tests = [...Tests, testId];
       }
 
@@ -214,7 +214,7 @@ export default {
       for (let testId of Tests) {
         tests = [
           ...tests,
-          ...this.tests.filter(x => x.TestID == testId).map(x => x.TestName)
+          ...this.tests.filter(x => x.testID == testId).map(x => x.TestName)
         ];
       }
 
@@ -308,18 +308,9 @@ export default {
         order.age = getAge(order.DOB);
 
         let tests = order.tests.map(test => {
-          /////////////////////////////////////////////////////////////////////////////////////////
-          ///////////// FOR TESTING PURPOSE ///////////////////////////////////////////////////////
-          /////////////////////////////////////////////////////////////////////////////////////////
-          // const getRandomInt = (min, max) => Math.floor((Math.random() * Math.floor(max-min))+min);
+          let filtered = this.tests.filter(x => x.testID == test.TestID);
 
-          // let idx = getRandomInt(0, this.tests.length - 1);
-          // test.TestID = this.tests[idx].TestID;
-          /////////////////////////////////////////////////////////////////////////////////////////
-
-          let filtered = this.tests.filter(x => x.TestID == test.TestID);
-
-          if (filtered.length) test.TestName = filtered[0].TestName;
+          if (filtered.length) test.TestName = filtered[0].testName;
           else test.TestName = test.TestID;
 
           return test;
