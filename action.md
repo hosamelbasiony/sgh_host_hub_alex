@@ -18,6 +18,10 @@ tar xzf ./actions-runner-linux-x64-2.309.0.tar.gz
 ./config.sh --url https://github.com/hosamelbasiony/sgh_host_hub_alex --token ADY7WINHACPGBGHOOU33S7LFBFXGY
 
 ./run.sh
+sudo ./svc.sh
+sudo ./svc.sh install
+sudo ./svc.sh start
+sudo ./svc.sh status
 ```
 
 # Using your self-hosted runner
