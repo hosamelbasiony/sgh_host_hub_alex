@@ -27,5 +27,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i --force
+    - run: pm2 start index.js --name=host_hub_alex
+    - run: pm2 startup
+    - run: pm2 save
     # - run: npm run build --if-present
     # - run: npm test
