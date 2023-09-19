@@ -307,7 +307,7 @@ module.exports = (connection) => {
                 FROM [IPOP_LABORDERS] AS [labOrder] WHERE [labOrder].[LabNumber] = '${record.LabNumber}'
                 AND [labOrder].[DateTimeCollected] >= CAST('${dateFrom}' AS DATE)
                 AND [labOrder].[DateTimeCollected] <= CAST('${dateTo}' AS DATE)`;
-                
+
                 let tests = await connection.query(sql, { type: Sequelize.QueryTypes.SELECT});
 
                 let temp = JSON.parse(JSON.stringify(record));
