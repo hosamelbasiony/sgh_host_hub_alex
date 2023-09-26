@@ -12,6 +12,7 @@
       ></v-text-field>
 
       <v-text-field
+        disabled
         v-model="todate"
         class="ml-1"
         label="To Date"
@@ -20,19 +21,47 @@
       ></v-text-field>
     </div>
 
-    <v-text-field v-model="id" label="Id Crit" @keyup="hndlOrderIdKeyup($event)" autofocus></v-text-field>
+    <v-text-field
+      v-model="id"
+      label="Id Crit"
+      @keyup="hndlOrderIdKeyup($event)"
+      autofocus
+    ></v-text-field>
 
-    <v-btn class="mr-md-3 mr-xs-1" tile color="indigo" dark @click="byOrderId()">Order Id</v-btn>
-    <v-btn class="mr-md-3 mr-xs-1" tile color="teal" dark @click="byPatientId()">Patient Id</v-btn>
-    <v-btn class="mr-md-3 mr-xs-1" tile color="orange" dark @click="byLabNumber()">Lab Number</v-btn>
+    <v-btn class="mr-md-3 mr-xs-1" tile color="indigo" dark @click="byOrderId()"
+      >Order Id</v-btn
+    >
+    <v-btn class="mr-md-3 mr-xs-1" tile color="teal" dark @click="byPatientId()"
+      >Patient Id</v-btn
+    >
+    <v-btn
+      class="mr-md-3 mr-xs-1"
+      tile
+      color="orange"
+      dark
+      @click="byLabNumber()"
+      >Lab Number</v-btn
+    >
     <!-- <v-btn class="ml-4 mr-md-3 mr-xs-1" tile color="green" dark @click="byLabNumber()">Print Labels</v-btn>
     <v-btn class="ml-4 mr-md-3 mr-xs-1" tile color="green" dark @click="byLabNumber()">Print Receipt</v-btn>-->
 
-    <v-btn color="blue-grey" class="ma-2 white--text" fab small @click="printBarcodes()">
+    <v-btn
+      color="blue-grey"
+      class="ma-2 white--text"
+      fab
+      small
+      @click="printBarcodes()"
+    >
       <v-icon dark>mdi-barcode</v-icon>
     </v-btn>
 
-    <v-btn class="ma-2 white--text" fab small color="error" @click="printReceipts()">
+    <v-btn
+      class="ma-2 white--text"
+      fab
+      small
+      color="error"
+      @click="printReceipts()"
+    >
       <v-icon dark>mdi-receipt</v-icon>
     </v-btn>
 
@@ -48,12 +77,21 @@
           <!-- <div class="overline mb-4">Order id: {{ order.OrderID }}</div> -->
           <!-- <span>{{moment(date).format('YYYY-MM-DD')}}</span> -->
 
-          <v-list-item-subtitle color="red" class="font-weight-black">Order id: {{ order.OrderID }}</v-list-item-subtitle>
-          <v-list-item-subtitle class="font-weight-black">Lab Number: {{ order.LabNumber }}</v-list-item-subtitle>
-          <v-list-item-subtitle
-            class="font-weight-black"
-          >Date of collection: {{ moment(order.DateTimeCollected).format('dddd YYYY-MM-DD hh:mm A') }}</v-list-item-subtitle>
-          <v-list-item-title class="headline mb-1">{{ order.PatientName }}</v-list-item-title>
+          <v-list-item-subtitle color="red" class="font-weight-black"
+            >Order id: {{ order.OrderID }}</v-list-item-subtitle
+          >
+          <v-list-item-subtitle class="font-weight-black"
+            >Lab Number: {{ order.LabNumber }}</v-list-item-subtitle
+          >
+          <v-list-item-subtitle class="font-weight-black"
+            >Date of collection:
+            {{
+              moment(order.DateTimeCollected).format("dddd YYYY-MM-DD hh:mm A")
+            }}</v-list-item-subtitle
+          >
+          <v-list-item-title class="headline mb-1">{{
+            order.PatientName
+          }}</v-list-item-title>
 
           <!-- <v-chip color="#06508c" class="white--text" v-for="test in order.tests" :key="test.TestID"> -->
           <v-chip
@@ -279,21 +317,78 @@ export default {
     },
 
     byLabNumber() {
-      this.load(
-        `${process.env.VUE_APP_API_URL}sgh/by-lab-id/${this.id}/${this.fromdate}/${this.todate}`
+      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
+      let days = parseInt(duration.asDays());
+
+      this.loadData(
+        `${process.env.VUE_APP_ORDERS_API_URL}/LastDays/${days}/LabNumber/${this.id}`
       );
+
+      // this.load(
+      //   `${process.env.VUE_APP_API_URL}sgh/by-lab-id/${this.id}/${this.fromdate}/${this.todate}`
+      // );
     },
 
     byPatientId() {
-      this.load(
-        `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
+      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
+      let days = parseInt(duration.asDays());
+
+      this.loadData(
+        `${process.env.VUE_APP_ORDERS_API_URL}/LastDays/${days}/PatientId/${this.id}`
       );
+      
+      // this.load(
+      //   `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
+      // );
     },
 
     byOrderId() {
-      this.load(
-        `${process.env.VUE_APP_API_URL}sgh/by-order-id/${this.id}/${this.fromdate}/${this.todate}`
+      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
+      let days = parseInt(duration.asDays());
+
+      this.loadData(
+        `${process.env.VUE_APP_ORDERS_API_URL}/LastDays/${days}/OrderId/${this.id}`
       );
+
+      // this.load(
+      //   `${process.env.VUE_APP_API_URL}sgh/by-order-id/${this.id}/${this.fromdate}/${this.todate}`
+      // );
+    },
+
+    async loadData(url) {
+      this.orders = [];
+
+      this.setBusy(true);
+
+      let ret = await axios.get(url);
+      let orders = ret.data;
+
+      for (let order of orders) {
+        order.age = getAge(order.DOB);
+
+        let tests = order.tests.map(test => {
+          let filtered = this.tests.filter(x => x.testID == test.TestID);
+
+          if (filtered.length) test.TestName = filtered[0].testName;
+          else test.TestName = test.TestID;
+
+          return test;
+        });
+
+        order.tests = tests;
+        // order.DateTimeCollected = tests[0].DateTimeCollected;
+        order.DateTimeCollected = this.moment(
+          tests[0].DateTimeCollected
+        ).subtract(2, "hours");
+
+        order.testNames = order.tests.map(x => x.TestName).join(", ");
+      }
+
+      this.orders = orders;
+
+      console.log(orders);
+
+      this.setBusy(false);
     },
 
     async load(url) {
@@ -336,14 +431,12 @@ export default {
   async created() {
     // let ret = await axios.get(`${process.env.VUE_APP_API_URL}sgh/tests`);
     // this.tests = ret.data;
-   
-    let ret = await axios.get(`${process.env.VUE_APP_TESTS_API_URL}`);
-    this.tests = ret.data;
 
-    window["tests"] = this.tests;
-
-    this.fromdate = this.moment(new Date()).format("YYYY-MM-DD");
+    this.fromdate = this.moment(new Date())
+      .subtract(7, "days")
+      .format("YYYY-MM-DD");
     this.todate = this.moment(new Date()).format("YYYY-MM-DD");
+
 
     window["moment"] = this.moment;
 
@@ -356,10 +449,32 @@ export default {
       console.log("printers:", printers);
     });
 
+    let ret = await axios.get(`${process.env.VUE_APP_TESTS_API_URL}`);
+    this.tests = ret.data;
+
+    window["tests"] = this.tests;
+
+    // alert(this.todate)
+
+    // this.fromdate = this.moment(new Date())
+    //   .subtract(7, "days")
+    //   .format("YYYY-MM-DD");
+    // this.todate = this.moment(new Date()).format("YYYY-MM-DD");
+
+    // window["moment"] = this.moment;
+
+    // this.barcode = new barcode();
+
+    // this.barcode.createObservableSocket().subscribe(msg => {
+    //   //console.log('websocket next msg:', msg)
+    //   let printers = msg.split(String.fromCharCode(29));
+    //   this.barcode.settings.printers = printers.filter(x => x != "");
+    //   console.log("printers:", printers);
+    // });
+
     // this.barcode.send(msg);
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>
