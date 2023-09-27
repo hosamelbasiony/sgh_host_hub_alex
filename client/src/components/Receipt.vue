@@ -308,11 +308,39 @@ export default {
     },
 
     hndlOrderIdKeyup(event) {
+
+      // [
+      //     {
+      //         "orderID": 25,
+      //         "labNumber": "864212",
+      //         "hospitalCode": "EG01",
+      //         "billNo": "5CS1",
+      //         "patientID": 30000219,
+      //         "patientName": "Maryam GAMAL   ABDEL NASSER morsy",
+      //         "dob": "1986-01-15T00:00:00",
+      //         "gendar": "Female",
+      //         "patientType": "OP",
+      //         "tests": [
+      //             {
+      //                 "testID": 7930,
+      //                 "dateTimeCollected": "2023-09-24T19:10:39.660"
+      //             }
+      //         ]
+      //     }
+      // ]
+
       if (event.key == "Enter") {
-        // this.byOrderId(event.target.value);
-        this.load(
-          `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
+        let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
+        let days = parseInt(duration.asDays());
+
+        this.loadData(
+          `${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`
         );
+
+        // this.byOrderId(event.target.value);
+        // this.load(
+        //   `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
+        // );
       }
     },
 
@@ -334,7 +362,7 @@ export default {
       let days = parseInt(duration.asDays());
 
       this.loadData(
-        `${process.env.VUE_APP_ORDERS_API_URL}/LastDays/${days}/PatientId/${this.id}`
+        `${process.env.VUE_APP_ORDERS_API_URL}/PatientID/${this.id}`
       );
       
       // this.load(
@@ -347,7 +375,7 @@ export default {
       let days = parseInt(duration.asDays());
 
       this.loadData(
-        `${process.env.VUE_APP_ORDERS_API_URL}/LastDays/${days}/OrderId/${this.id}`
+        `${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`
       );
 
       // this.load(
@@ -364,6 +392,41 @@ export default {
       let orders = ret.data;
 
       for (let order of orders) {
+      // [
+      //     {
+      //         "orderID": 25,
+      //         "labNumber": "864212",
+      //         "hospitalCode": "EG01",
+      //         "billNo": "5CS1",
+      //         "patientID": 30000219,
+      //         "patientName": "Maryam GAMAL   ABDEL NASSER morsy",
+      //         "dob": "1986-01-15T00:00:00",
+      //         "gendar": "Female",
+      //         "patientType": "OP",
+      //         "tests": [
+      //             {
+      //                 "testID": 7930,
+      //                 "dateTimeCollected": "2023-09-24T19:10:39.660"
+      //             }
+      //         ]
+      //     }
+      // ]
+
+        order.OrderID = order.orderID;
+        order.LabNumber = order.labNumber;
+        order.HospitalCode = order.hospitalCode;
+        order.BillNo = order.billNo;
+        order.PatientID = order.patientID;
+        order.PatientName = order.patientName;
+        order.DOB = order.dob;
+        order.Gendar = order.gendar;
+        order.PatientType = order.patientType;
+        order.tests = order.tests.map( x => ({
+          ...x,
+          TestID: x.testID,
+          DateTimeCollected: x.dateTimeCollected
+        }));
+
         order.age = getAge(order.DOB);
 
         let tests = order.tests.map(test => {
