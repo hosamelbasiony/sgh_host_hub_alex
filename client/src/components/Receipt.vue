@@ -23,7 +23,7 @@
 
     <v-text-field
       v-model="id"
-      label="Id Crit"
+      label="id criteria"
       @keyup="hndlOrderIdKeyup($event)"
       autofocus
     ></v-text-field>
@@ -330,9 +330,6 @@ export default {
       // ]
 
       if (event.key == "Enter") {
-        let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
-        let days = parseInt(duration.asDays());
-
         this.loadData(
           `${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`
         );
@@ -358,9 +355,6 @@ export default {
     },
 
     byPatientId() {
-      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
-      let days = parseInt(duration.asDays());
-
       this.loadData(
         `${process.env.VUE_APP_ORDERS_API_URL}/PatientID/${this.id}`
       );
@@ -496,7 +490,7 @@ export default {
     // this.tests = ret.data;
 
     this.fromdate = this.moment(new Date())
-      .subtract(14, "days")
+      .subtract(7, "days")
       .format("YYYY-MM-DD");
     this.todate = this.moment(new Date()).format("YYYY-MM-DD");
 
