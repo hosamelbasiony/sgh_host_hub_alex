@@ -496,7 +496,7 @@ export default {
     // this.tests = ret.data;
 
     this.fromdate = this.moment(new Date())
-      .subtract(7, "days")
+      .subtract(14, "days")
       .format("YYYY-MM-DD");
     this.todate = this.moment(new Date()).format("YYYY-MM-DD");
 
