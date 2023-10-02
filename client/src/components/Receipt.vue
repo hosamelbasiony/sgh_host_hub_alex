@@ -23,7 +23,7 @@
 
     <v-text-field
       v-model="id"
-      label="id criteria"
+      label="identification criteria"
       @keyup="hndlOrderIdKeyup($event)"
       autofocus
     ></v-text-field>
@@ -521,7 +521,7 @@ export default {
       ...x,
       TestCode: x.testCode,
       TestID: x.testID,
-      TestName: x.testName,
+      TestName: x.testName
     }));
 
     // [
