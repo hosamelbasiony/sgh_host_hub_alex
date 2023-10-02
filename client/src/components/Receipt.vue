@@ -216,7 +216,7 @@ export default {
 
       const msg = {
         text: {
-          function: "print label wide",
+          function: "print label sgh",
           grouped: "1",
           printer: this.barcode.settings.barcodePrinter,
           labno: order.LabNumber,
@@ -453,7 +453,7 @@ export default {
         console.log(orders);
       } catch (error) {
         // TODO
-        alert("NOT FOUND");
+        alert("ID NOT FOUND");
       }
 
       this.setBusy(false);

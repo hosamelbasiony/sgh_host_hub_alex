@@ -29,7 +29,7 @@ jobs:
         cache: 'npm'
     # - run: npm i --force
     - run: cp ../node_modules ./ -r
-    - run: pm2 restart 0
+    - run: pm2 restart host_hub
     # - run: pm2 start index.js --name=host_hub_alex
     # - run: pm2 startup
     # - run: pm2 save
