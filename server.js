@@ -1,7 +1,7 @@
 var JSFtp = require("jsftp");
 
 var ftp = new JSFtp({
-  host: '130.7.5.49', 
+  host: '130.7.5.49',
   user: 'tarqeem',
   pass: 'tarqeem',
   debugMode: true
