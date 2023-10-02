@@ -154,21 +154,21 @@ export default {
     dropdown_icon: [
       { text: "list", callback: () => console.log("list") },
       { text: "favorite", callback: () => console.log("favorite") },
-      { text: "delete", callback: () => console.log("delete") }
+      { text: "delete", callback: () => console.log("delete") },
     ],
     dropdown_edit: [
       { text: "100%" },
       { text: "75%" },
       { text: "50%" },
       { text: "25%" },
-      { text: "0%" }
-    ]
+      { text: "0%" },
+    ],
   }),
 
   computed: mapGetters(["params"]),
 
   components: {
-    Settings
+    Settings,
   },
 
   methods: {
@@ -187,7 +187,7 @@ export default {
         tests: this.orders.reduce(
           (total, currentValue) => [...total, ...currentValue.tests],
           []
-        )
+        ),
       };
       this.setReceipt(order);
       PrintSubject.next(order);
@@ -237,22 +237,31 @@ export default {
           top: this.barcode.settings.topMargin,
           left: this.barcode.settings.leftMargin,
           labelsize: this.barcode.settings.labelsize,
-          referral: ""
-        }
+          referral: "",
+        },
       };
 
       let tests = [];
       let Tests = [];
-      for (let testId of order.tests.map(x => x.testID)) {
+      for (let testId of order.tests.map((x) => x.testID)) {
         if (!Tests.includes(testId)) Tests = [...Tests, testId];
       }
 
       console.log("***ALL TESTS***", this.tests);
+      // [
+      // {
+      //   testCode,
+      //   testID,
+      //   testName,
+      // }
+      // ]
 
       for (let testId of Tests) {
         tests = [
           ...tests,
-          ...this.tests.filter(x => x.testID == testId).map(x => x.TestName)
+          ...this.tests
+            .filter((x) => x.testID == testId)
+            .map((x) => x.TestName),
         ];
       }
 
@@ -308,7 +317,6 @@ export default {
     },
 
     hndlOrderIdKeyup(event) {
-
       // [
       //     {
       //         "orderID": 25,
@@ -342,7 +350,9 @@ export default {
     },
 
     byLabNumber() {
-      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
+      let duration = this.moment.duration(
+        this.moment(this.todate).diff(this.moment(this.fromdate))
+      );
       let days = parseInt(duration.asDays());
 
       this.loadData(
@@ -358,19 +368,15 @@ export default {
       this.loadData(
         `${process.env.VUE_APP_ORDERS_API_URL}/PatientID/${this.id}`
       );
-      
+
       // this.load(
       //   `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
       // );
     },
 
     byOrderId() {
-      let duration = this.moment.duration(this.moment(this.todate).diff(this.moment(this.fromdate)));
-      let days = parseInt(duration.asDays());
-
-      this.loadData(
-        `${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`
-      );
+      
+      this.loadData(`${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`);
 
       // this.load(
       //   `${process.env.VUE_APP_API_URL}sgh/by-order-id/${this.id}/${this.fromdate}/${this.todate}`
@@ -382,68 +388,73 @@ export default {
 
       this.setBusy(true);
 
-      let ret = await axios.get(url);
-      let orders = ret.data;
+      try {
+        let ret = await axios.get(url);
+        let orders = ret.data;
 
-      for (let order of orders) {
-      // [
-      //     {
-      //         "orderID": 25,
-      //         "labNumber": "864212",
-      //         "hospitalCode": "EG01",
-      //         "billNo": "5CS1",
-      //         "patientID": 30000219,
-      //         "patientName": "Maryam GAMAL   ABDEL NASSER morsy",
-      //         "dob": "1986-01-15T00:00:00",
-      //         "gendar": "Female",
-      //         "patientType": "OP",
-      //         "tests": [
-      //             {
-      //                 "testID": 7930,
-      //                 "dateTimeCollected": "2023-09-24T19:10:39.660"
-      //             }
-      //         ]
-      //     }
-      // ]
+        for (let order of orders) {
+          // [
+          //     {
+          //         "orderID": 25,
+          //         "labNumber": "864212",
+          //         "hospitalCode": "EG01",
+          //         "billNo": "5CS1",
+          //         "patientID": 30000219,
+          //         "patientName": "Maryam GAMAL   ABDEL NASSER morsy",
+          //         "dob": "1986-01-15T00:00:00",
+          //         "gendar": "Female",
+          //         "patientType": "OP",
+          //         "tests": [
+          //             {
+          //                 "testID": 7930,
+          //                 "dateTimeCollected": "2023-09-24T19:10:39.660"
+          //             }
+          //         ]
+          //     }
+          // ]
 
-        order.OrderID = order.orderID;
-        order.LabNumber = order.labNumber;
-        order.HospitalCode = order.hospitalCode;
-        order.BillNo = order.billNo;
-        order.PatientID = order.patientID;
-        order.PatientName = order.patientName;
-        order.DOB = order.dob;
-        order.Gendar = order.gendar;
-        order.PatientType = order.patientType;
-        order.tests = order.tests.map( x => ({
-          ...x,
-          TestID: x.testID,
-          DateTimeCollected: x.dateTimeCollected
-        }));
+          order.OrderID = order.orderID;
+          order.LabNumber = order.labNumber;
+          order.HospitalCode = order.hospitalCode;
+          order.BillNo = order.billNo;
+          order.PatientID = order.patientID;
+          order.PatientName = order.patientName;
+          order.DOB = order.dob;
+          order.Gendar = order.gendar;
+          order.PatientType = order.patientType;
+          order.tests = order.tests.map((x) => ({
+            ...x,
+            TestID: x.testID,
+            DateTimeCollected: x.dateTimeCollected,
+          }));
 
-        order.age = getAge(order.DOB);
+          order.age = getAge(order.DOB);
 
-        let tests = order.tests.map(test => {
-          let filtered = this.tests.filter(x => x.testID == test.TestID);
+          let tests = order.tests.map((test) => {
+            let filtered = this.tests.filter((x) => x.testID == test.TestID);
 
-          if (filtered.length) test.TestName = filtered[0].testName;
-          else test.TestName = test.TestID;
+            if (filtered.length) test.TestName = filtered[0].testName;
+            else test.TestName = test.TestID;
 
-          return test;
-        });
+            return test;
+          });
 
-        order.tests = tests;
-        // order.DateTimeCollected = tests[0].DateTimeCollected;
-        order.DateTimeCollected = this.moment(
-          tests[0].DateTimeCollected
-        ).subtract(2, "hours");
+          order.tests = tests;
+          // order.DateTimeCollected = tests[0].DateTimeCollected;
+          order.DateTimeCollected = this.moment(
+            tests[0].DateTimeCollected
+          ).subtract(2, "hours");
 
-        order.testNames = order.tests.map(x => x.TestName).join(", ");
+          order.testNames = order.tests.map((x) => x.TestName).join(", ");
+        }
+
+        this.orders = orders;
+
+        console.log(orders);
+      } catch (error) {
+        // TODO
+        alert("NOT FOUND");
       }
-
-      this.orders = orders;
-
-      console.log(orders);
 
       this.setBusy(false);
     },
@@ -459,8 +470,8 @@ export default {
       for (let order of orders) {
         order.age = getAge(order.DOB);
 
-        let tests = order.tests.map(test => {
-          let filtered = this.tests.filter(x => x.testID == test.TestID);
+        let tests = order.tests.map((test) => {
+          let filtered = this.tests.filter((x) => x.testID == test.TestID);
 
           if (filtered.length) test.TestName = filtered[0].testName;
           else test.TestName = test.TestID;
@@ -474,7 +485,7 @@ export default {
           tests[0].DateTimeCollected
         ).subtract(2, "hours");
 
-        order.testNames = order.tests.map(x => x.TestName).join(", ");
+        order.testNames = order.tests.map((x) => x.TestName).join(", ");
       }
 
       this.orders = orders;
@@ -482,7 +493,7 @@ export default {
       console.log(orders);
 
       this.setBusy(false);
-    }
+    },
   },
 
   async created() {
@@ -494,20 +505,32 @@ export default {
       .format("YYYY-MM-DD");
     this.todate = this.moment(new Date()).format("YYYY-MM-DD");
 
-
     window["moment"] = this.moment;
 
     this.barcode = new barcode();
 
-    this.barcode.createObservableSocket().subscribe(msg => {
+    this.barcode.createObservableSocket().subscribe((msg) => {
       //console.log('websocket next msg:', msg)
       let printers = msg.split(String.fromCharCode(29));
-      this.barcode.settings.printers = printers.filter(x => x != "");
+      this.barcode.settings.printers = printers.filter((x) => x != "");
       console.log("printers:", printers);
     });
 
     let ret = await axios.get(`${process.env.VUE_APP_TESTS_API_URL}`);
-    this.tests = ret.data;
+    this.tests = ret.data.map((x) => ({
+      ...x,
+      TestCode: x.testCode,
+      TestID: x.testID,
+      TestName: x.testName,
+    }));
+
+    // [
+    // {
+    //   testCode,
+    //   testID,
+    //   testName,
+    // }
+    // ]
 
     window["tests"] = this.tests;
 
@@ -530,7 +553,7 @@ export default {
     // });
 
     // this.barcode.send(msg);
-  }
+  },
 };
 </script>
 
