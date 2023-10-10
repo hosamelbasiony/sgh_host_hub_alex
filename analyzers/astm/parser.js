@@ -170,7 +170,7 @@ class AstmSocketParser extends EventEmitter {
                     else if ( this.device.name == 'Stago' ) code = line.split("|")[2].split('^')[3]; 
                     else code = line.split("|")[2].split('^')[3].split('/')[0];
 
-                    // console.log(code);
+                    // console.log("code", code);
 
                     let type_ = '';
                     if ( line.split("|")[2].split('^').length > 9 ) type_ = line.split("|")[2].split('^')[10];
@@ -188,7 +188,7 @@ class AstmSocketParser extends EventEmitter {
                             }
                         });
 
-                        // console.log(code, this.device.id, filteredCodes)
+                        console.log(code, this.device.id, filteredCodes)
             
                         // let filteredCodes = this.device.codes.filter( x => x.upload && x.code == code);
                         for ( let filteredCode of filteredCodes ) {

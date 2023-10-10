@@ -207,7 +207,7 @@ const server = net.createServer( (socket) => {
         console.log(sid+ " to request");
         toRequesition = [...toRequesition, sid]
     });
-    parser.on( 'results', results => saveResults(results) );
+    parser.on( 'results', results => saveResults(device, results) );
     parser.on( 'startDownload', _ => {
         console.log('startDownload' + JSON.stringify(toRequesition, undefined, 4));
         if ( toRequesition.length ) {
