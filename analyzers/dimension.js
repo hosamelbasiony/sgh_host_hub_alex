@@ -237,7 +237,7 @@ let test = () => {
     var client = net.connect({port: PORT}, () => client.write(messages.shift()));
 
     client.on("data", data => {
-        console.log(data.toString())
+        console.log("DIMENSION IN: ", data.toString())
         fileSystem.appendFile('./log/dimension_client_test.txt', data.toString() + "\n\n", err => { });
 
         if( data.toString().indexOf(ETX) > -1 ) client.write(ACK);
