@@ -39,7 +39,7 @@ class AstmSocketParser extends EventEmitter {
 
     async parse(msg, device) {
 
-        console.log('parsing: ' + msg);
+        console.log(('parsing: ' + msg).cyan);
 
         let msgTypeIsQuery = false;
         

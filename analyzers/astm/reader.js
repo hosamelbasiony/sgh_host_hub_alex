@@ -40,10 +40,12 @@ class AstmSocketReader extends EventEmitter {
 
     __handleData(data) {
         try {
+
+            data = data.toString();
             
-            fileSystem.appendFile(this.inDir, data.toString(), err => {});   
+            fileSystem.appendFile(this.inDir, data, err => {});   
             
-            console.log(data);
+            // console.log(data);
 
             for ( var x=0; x<data.length; x++) {
                 
