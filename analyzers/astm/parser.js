@@ -177,6 +177,12 @@ class AstmSocketParser extends EventEmitter {
 
                         let result_ = line.split("|")[3];
                         // if (this.device.name == 'E411' && result_.indexOf(("^") > -1)) result_ = result_.split("^")[1];
+                        
+                        let tmpRes = result_.split("");
+                        result_ = "";
+                        for( let d of tmpRes ) if (d=="^") result_ = ""
+                        else result_ += d;
+
 
                         // console.log(type_);
 
