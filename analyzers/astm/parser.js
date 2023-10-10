@@ -200,8 +200,9 @@ class AstmSocketParser extends EventEmitter {
                             // let filteredCodes = this.device.codes.filter( x => x.upload && x.code == code);
                             for (let filteredCode of filteredCodes) {
 
-                                let fltrd = result.lines.find(x => x.code == code);
-                                if (!fltrd) result.lines = [...result.lines, {
+                                // let fltrd = result.lines.find(x => x.code == code);
+                                // if (!fltrd) 
+                                result.lines = [...result.lines, {
                                     code,
                                     result: result_,
                                     hostcode: code,
