@@ -213,7 +213,7 @@ class AstmSocketParser extends EventEmitter {
                         }
 
                         this.emit("results", result);
-                        console.log(result);
+                        // console.log(result);
 
                     }
 
