@@ -214,7 +214,7 @@ class AstmSocketParser extends EventEmitter {
                             // console.log(result);
                         }
 
-                        this.emit("results", result);
+                        // this.emit("results", result);
                         // console.log(result);
 
                     }
@@ -225,6 +225,8 @@ class AstmSocketParser extends EventEmitter {
 
         if (msgTypeIsQuery) this.emit("startDownload", {});
         else {
+
+            if (result.lines.length) this.emit("results", result);
 
             // console.log(JSON.stringify(result, undefined, 2));
 
