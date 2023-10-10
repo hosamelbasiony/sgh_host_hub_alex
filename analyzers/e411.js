@@ -127,7 +127,7 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
         // ret = { codes: ret, patientId, patientName };
 
         // let ret = await reqCodes(device, this.sid);
-        let ret = { codes: ["10"], patientId: "123456", patientName: "HOSAM MOHAMMAD ALI", gender: "M", DOB: "1978-08-05" }
+        let ret = { codes: ["761"], patientId: "123456", patientName: "HOSAM MOHAMMAD ALI", gender: "M", DOB: "1978-08-05" }
 
         ///////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////
