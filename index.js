@@ -136,7 +136,7 @@ connection.sync().then( async() => {
         e411.start(io, connection, sghConnection);
         sysmex_urine.start(io, connection, sghConnection);
         
-        // dimension.start(io, connection, sghConnection);
+        dimension.start(io, connection, sghConnection);
     });
 });
 

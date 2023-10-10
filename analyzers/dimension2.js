@@ -18,7 +18,7 @@ let device = {
 let sgh;
 let connection;
 
-const PORT = 2251;
+const PORT = 2252;
 
 const SOH = String.fromCharCode(1);
 const STX = String.fromCharCode(2);
