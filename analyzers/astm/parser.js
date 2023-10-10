@@ -189,7 +189,7 @@ class AstmSocketParser extends EventEmitter {
                                 }
                             });
 
-                            console.log(code, this.device.id, filteredCodes)
+                            // console.log(code, this.device.id, filteredCodes)
 
                             // let filteredCodes = this.device.codes.filter( x => x.upload && x.code == code);
                             for (let filteredCode of filteredCodes) {
@@ -201,12 +201,12 @@ class AstmSocketParser extends EventEmitter {
                                     parameter_id: filteredCode.paramId,
                                     type_
                                 }];
-
-                                this.emit("results", result);
                             }
 
                             // console.log(result);
                         }
+
+                        this.emit("results", result);
 
                     }
 
