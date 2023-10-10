@@ -215,7 +215,7 @@ exports.start = (io, conn, sghConn) => {
 
         console.log(`\nDimension host tcp server listening on ${PORT} `.bgBrightYellow);
 
-        test();        
+        // test();        
     });
 };
 
