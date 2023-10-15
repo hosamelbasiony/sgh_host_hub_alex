@@ -221,12 +221,11 @@ const server = net.createServer( (socket) => {
     let parser = new AstmSocketParser(socket, device, connection, sgh);
 
     reader.on ( 'data', async data => {
-
-        // fileSystem.appendFile('./data/ca600_in.txt', JSON.stringify(data), err => {});
-        // 
+        
+        data = data.toString();
         fileSystem.appendFile('./log/ca600_to_parse.txt', JSON.stringify(data), err => {});   
-
-        // console.log(data);
+        console.log(data);
+        
         toRequesition = [];
         await parser.parse(data, device);
     });

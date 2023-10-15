@@ -131,7 +131,7 @@ connection.sync().then( async() => {
  
         advia560.start(io, connection, sghConnection);
         // archi.start(io, connection, sghConnection);
-        // ca600.start(io, connection, sghConnection);  
+        ca600.start(io, connection, sghConnection);  
         // abl800.start(io, connection, sghConnection);
         e411.start(io, connection, sghConnection);
         sysmex_urine.start(io, connection, sghConnection);
