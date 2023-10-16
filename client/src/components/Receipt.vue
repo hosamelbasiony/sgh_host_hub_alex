@@ -375,7 +375,6 @@ export default {
     },
 
     byOrderId() {
-      
       this.loadData(`${process.env.VUE_APP_ORDERS_API_URL}/OrderID/${this.id}`);
 
       // this.load(
@@ -392,45 +391,25 @@ export default {
         let ret = await axios.get(url);
         let orders = ret.data;
 
-        for (let order of orders) {
-          // [
-          //     {
-          //         "orderID": 25,
-          //         "labNumber": "864212",
-          //         "hospitalCode": "EG01",
-          //         "billNo": "5CS1",
-          //         "patientID": 30000219,
-          //         "patientName": "Maryam GAMAL   ABDEL NASSER morsy",
-          //         "dob": "1986-01-15T00:00:00",
-          //         "gendar": "Female",
-          //         "patientType": "OP",
-          //         "tests": [
-          //             {
-          //                 "testID": 7930,
-          //                 "dateTimeCollected": "2023-09-24T19:10:39.660"
-          //             }
-          //         ]
-          //     }
-          // ]
-
-          order.OrderID = order.orderID;
-          order.LabNumber = order.labNumber;
-          order.HospitalCode = order.hospitalCode;
-          order.BillNo = order.billNo;
-          order.PatientID = order.patientID;
-          order.PatientName = order.patientName;
-          order.DOB = order.dob;
-          order.Gendar = order.gendar;
-          order.PatientType = order.patientType;
-          order.tests = order.tests.map((x) => ({
+        for (let _order of orders) {
+          _order.OrderID = _order.orderID;
+          _order.LabNumber = _order.labNumber;
+          _order.HospitalCode = _order.hospitalCode;
+          _order.BillNo = _order.billNo;
+          _order.PatientID = _order.patientID;
+          _order.PatientName = _order.patientName;
+          _order.DOB = _order.dob;
+          _order.Gendar = _order.gendar;
+          _order.PatientType = _order.patientType;
+          _order.tests = _order.tests.map((x) => ({
             ...x,
             TestID: x.testID,
             DateTimeCollected: x.dateTimeCollected,
           }));
 
-          order.age = getAge(order.DOB);
+          _order.age = getAge(_order.DOB);
 
-          let tests = order.tests.map((test) => {
+          let tests = _order.tests.map((test) => {
             let filtered = this.tests.filter((x) => x.testID == test.TestID);
 
             if (filtered.length) test.TestName = filtered[0].testName;
@@ -439,16 +418,24 @@ export default {
             return test;
           });
 
-          order.tests = tests;
-          // order.DateTimeCollected = tests[0].DateTimeCollected;
-          order.DateTimeCollected = this.moment(
-            tests[0].DateTimeCollected
-          ).subtract(2, "hours");
+          // try {
+          _order.tests = tests;
+          if (tests.length) {
+            _order.DateTimeCollected = this.moment(
+              tests[0].DateTimeCollected
+            ).subtract(2, "hours");
+          } else {
+            alert(`Lab Number: ${_order.labNumber} has no tests !`);
+            _order.DateTimeCollected = "";
+          }
 
-          order.testNames = order.tests.map((x) => x.TestName).join(", ");
+          _order.testNames = _order.tests.map((x) => x.TestName).join(", ");
+          // } catch (error) {
+          //   console.log("error", _order)
+          // }
         }
 
-        this.orders = orders;
+        this.orders = orders.filter((x) => x.tests.length);
 
         console.log(orders);
       } catch (error) {
@@ -494,6 +481,177 @@ export default {
 
       this.setBusy(false);
     },
+
+    testOrders() {
+      let orders = [
+        {
+          orderID: 110,
+          labNumber: "10453",
+          hospitalCode: "EG01",
+          billNo: "CS46",
+          patientID: 30000309,
+          patientName: "elin mohamed MOHAMED ANWAR",
+          dob: "2013-05-09T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 8035, dateTimeCollected: "2023-10-15T10:13:25.400" },
+          ],
+        },
+        {
+          orderID: 110,
+          labNumber: "138361",
+          hospitalCode: "EG01",
+          billNo: "CS46",
+          patientID: 30000309,
+          patientName: "elin mohamed MOHAMED ANWAR",
+          dob: "2013-05-09T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 7966, dateTimeCollected: "2023-10-15T10:13:21.143" },
+          ],
+        },
+        {
+          orderID: 110,
+          labNumber: "346234",
+          hospitalCode: "EG01",
+          billNo: "CS46",
+          patientID: 30000309,
+          patientName: "elin mohamed MOHAMED ANWAR",
+          dob: "2013-05-09T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 8864, dateTimeCollected: "2023-10-15T15:02:47.250" },
+          ],
+        },
+        {
+          orderID: 110,
+          labNumber: "864254",
+          hospitalCode: "EG01",
+          billNo: "CS46",
+          patientID: 30000309,
+          patientName: "elin mohamed MOHAMED ANWAR",
+          dob: "2013-05-09T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 7930, dateTimeCollected: "2023-10-15T10:13:29.013" },
+          ],
+        },
+      ];
+
+      //order.DateTimeCollected
+
+      orders = [
+        {
+          orderID: 109,
+          labNumber: "14298",
+          hospitalCode: "EG01",
+          billNo: "CR119",
+          patientID: 331821,
+          patientName: "HEKMAT FARAG ABDELKEREM MOUSA",
+          dob: "1991-04-03T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 7785, dateTimeCollected: "2023-10-15T09:38:02.160" },
+            { testID: 8180, dateTimeCollected: "2023-10-15T09:38:02.160" },
+            { testID: 8186, dateTimeCollected: "2023-10-15T09:38:09.520" },
+            { testID: 8215, dateTimeCollected: "2023-10-15T09:38:09.520" },
+          ],
+        },
+        {
+          orderID: 109,
+          labNumber: "181597",
+          hospitalCode: "EG01",
+          billNo: "CR119",
+          patientID: 331821,
+          patientName: "HEKMAT FARAG ABDELKEREM MOUSA",
+          dob: "1991-04-03T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [],
+        },
+        {
+          orderID: 109,
+          labNumber: "185248",
+          hospitalCode: "EG01",
+          billNo: "CR119",
+          patientID: 331821,
+          patientName: "HEKMAT FARAG ABDELKEREM MOUSA",
+          dob: "1991-04-03T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 9699, dateTimeCollected: "2023-10-15T09:38:03.780" },
+          ],
+        },
+        {
+          orderID: 109,
+          labNumber: "864253",
+          hospitalCode: "EG01",
+          billNo: "CR119",
+          patientID: 331821,
+          patientName: "HEKMAT FARAG ABDELKEREM MOUSA",
+          dob: "1991-04-03T00:00:00",
+          gendar: "Female",
+          patientType: "OP",
+          tests: [
+            { testID: 7930, dateTimeCollected: "2023-10-15T09:38:05.837" },
+          ],
+        },
+      ];
+
+      for (let _order of orders) {
+        _order.OrderID = _order.orderID;
+        _order.LabNumber = _order.labNumber;
+        _order.HospitalCode = _order.hospitalCode;
+        _order.BillNo = _order.billNo;
+        _order.PatientID = _order.patientID;
+        _order.PatientName = _order.patientName;
+        _order.DOB = _order.dob;
+        _order.Gendar = _order.gendar;
+        _order.PatientType = _order.patientType;
+        _order.tests = _order.tests.map((x) => ({
+          ...x,
+          TestID: x.testID,
+          DateTimeCollected: x.dateTimeCollected,
+        }));
+
+        _order.age = getAge(_order.DOB);
+
+        let tests = _order.tests.map((test) => {
+          let filtered = this.tests.filter((x) => x.testID == test.TestID);
+
+          if (filtered.length) test.TestName = filtered[0].testName;
+          else test.TestName = test.TestID;
+
+          return test;
+        });
+
+        // try {
+        _order.tests = tests;
+        if (tests.length) {
+          _order.DateTimeCollected = this.moment(
+            tests[0].DateTimeCollected
+          ).subtract(2, "hours");
+        } else {
+          alert(`Lab Number: ${_order.labNumber} has no tests !`);
+          _order.DateTimeCollected = "";
+        }
+
+        _order.testNames = _order.tests.map((x) => x.TestName).join(", ");
+        // } catch (error) {
+        //   console.log("error", _order)
+        // }
+      }
+
+      this.orders = orders.filter((x) => x.tests.length);
+
+      console.log(orders);
+    },
   },
 
   async created() {
@@ -516,12 +674,16 @@ export default {
       console.log("printers:", printers);
     });
 
+    // setTimeout(() => {
+    //   this.testOrders();
+    // }, 100);
+
     let ret = await axios.get(`${process.env.VUE_APP_TESTS_API_URL}`);
     this.tests = ret.data.map((x) => ({
       ...x,
       TestCode: x.testCode,
       TestID: x.testID,
-      TestName: x.testName
+      TestName: x.testName,
     }));
 
     // [
