@@ -361,7 +361,7 @@ exports.start = (io, conn, sghConn) => {
     server.listen(PORT, () => {
         console.log(`\nSysmex-urine host tcp server listening on ${PORT} `.bgMagenta);
         
-        test(conn, sgh);
+        // test(conn, sgh);
     }); 
 };
 
