@@ -18,7 +18,7 @@ let resDir = path.resolve(process.cwd(), 'log', 'sysmex_u_out.txt');
 let device = {
     _id: '37',
     id: 37,
-    name: 'Sysmex', //urine
+    name: 'SysmexUrine', //urine
     codes: []
 };
 
@@ -178,7 +178,7 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
 
         msgtosend.reverse();
         
-        fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => {});  
+        fileSystem.appendFile('./log/sysmx_urine_out.txt', msgtosend[0].toString(), err => {});  
 
         if ( socket ) socket.write(ENQ);
 
@@ -221,7 +221,7 @@ const requestInfo = async ( lab_id, socket ) => {
     msgtosend.reverse();
     
     // console.log(msgtosend[0]); 
-    fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => {});  
+    fileSystem.appendFile('./log/sysmex_urine_out.txt', msgtosend[0].toString(), err => {});  
 
     if ( socket ) socket.write(ENQ);
 };

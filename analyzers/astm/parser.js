@@ -176,6 +176,7 @@ class AstmSocketParser extends EventEmitter {
                         if (line.split("|")[2].split('^').length > 9) type_ = line.split("|")[2].split('^')[10];
 
                         let result_ = line.split("|")[3];
+                        if (this.device.name == "SysmexUrine" && result_.indexOf(("^") > -1)) result_ = result_.split("^")[0];
                         // if (this.device.name == 'E411' && result_.indexOf(("^") > -1)) result_ = result_.split("^")[1];
 
                         let tmpRes = result_.split("");
@@ -229,7 +230,7 @@ class AstmSocketParser extends EventEmitter {
 
             if (result.lines.length) this.emit("results", result);
 
-            // console.log(JSON.stringify(result, undefined, 2));
+            console.log(JSON.stringify(result, undefined, 2).bgYellow);
 
             // result.lines = await mssql.getFilteredParams( result.sid, result.lines );
             // console.log(JSON.stringify(result, undefined, 4));
