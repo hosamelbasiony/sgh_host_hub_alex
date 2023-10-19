@@ -230,7 +230,7 @@ class AstmSocketParser extends EventEmitter {
 
             if (result.lines.length) this.emit("results", result);
 
-            console.log(JSON.stringify(result, undefined, 2).bgYellow);
+            console.log(JSON.stringify(result, undefined, 2).yellow);
 
             // result.lines = await mssql.getFilteredParams( result.sid, result.lines );
             // console.log(JSON.stringify(result, undefined, 4));
