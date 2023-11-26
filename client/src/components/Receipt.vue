@@ -365,9 +365,12 @@ export default {
     },
 
     byPatientId() {
-      this.loadData(
-        `${process.env.VUE_APP_ORDERS_API_URL}/PatientID/${this.id}`
-      );
+      // router.get('/by-patient-id/:id/:fromdate/:todate', controller.byPatientId);
+      let url = `${process.env.VUE_APP_ORDERS_API_URL}/PatientID/${this.id}`;
+      if (process.env.NODE_ENV == "development")
+        url = `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/2010-01-01/2100-01-01`;
+
+      this.loadData(url);
 
       // this.load(
       //   `${process.env.VUE_APP_API_URL}sgh/by-patient-id/${this.id}/${this.fromdate}/${this.todate}`
@@ -391,23 +394,45 @@ export default {
         let ret = await axios.get(url);
         let orders = ret.data;
 
+        // {
+        //     "LabNumber": "127547",
+        //     "DOB": "1982-01-01T00:00:00.000Z",
+        //     "Gendar": "Female",
+        //     "OrderID": 1924,
+        //     "PatientType": "OP",
+        //     "HospitalCode": "EG01",
+        //     "BillNo": "CS2689",
+        //     "PatientID": 2618,
+        //     "PatientName": "BOSY FATOH MOHAMED ABDELAL",
+        //     "tests": [
+        //         {
+        //             "TestID": 3968,
+        //             "DateTimeCollected": "2016-02-14T16:01:47.577Z"
+        //         }
+        //     ]
+        // }
+
         for (let _order of orders) {
-          _order.OrderID = _order.orderID;
-          _order.LabNumber = _order.labNumber;
-          _order.HospitalCode = _order.hospitalCode;
-          _order.BillNo = _order.billNo;
-          _order.PatientID = _order.patientID;
-          _order.PatientName = _order.patientName;
-          _order.DOB = _order.dob;
-          _order.Gendar = _order.gendar;
-          _order.PatientType = _order.patientType;
-          _order.tests = _order.tests.map((x) => ({
-            ...x,
-            TestID: x.testID,
-            DateTimeCollected: x.dateTimeCollected,
-          }));
+          if (_order.OrderID == null) {
+            _order.OrderID = _order.orderID;
+            _order.LabNumber = _order.labNumber;
+            _order.HospitalCode = _order.hospitalCode;
+            _order.BillNo = _order.billNo;
+            _order.PatientID = _order.patientID;
+            _order.PatientName = _order.patientName;
+            _order.DOB = _order.dob;
+            _order.Gendar = _order.gendar;
+            _order.PatientType = _order.patientType;
+            _order.tests = _order.tests.map((x) => ({
+              ...x,
+              TestID: x.testID,
+              DateTimeCollected: x.dateTimeCollected,
+            }));
+          }
 
           _order.age = getAge(_order.DOB);
+
+          console.log("refined order: ", _order)
 
           let tests = _order.tests.map((test) => {
             let filtered = this.tests.filter((x) => x.testID == test.TestID);
@@ -432,7 +457,7 @@ export default {
           _order.testNames = _order.tests.map((x) => x.TestName).join(", ");
           // } catch (error) {
           //   console.log("error", _order)
-          // } 
+          // }
         }
 
         this.orders = orders.filter((x) => x.tests.length);
@@ -658,6 +683,8 @@ export default {
     // let ret = await axios.get(`${process.env.VUE_APP_API_URL}sgh/tests`);
     // this.tests = ret.data;
 
+    this.id = process.env.VUE_APP_TEMP_PATIENT_ID;
+    
     this.fromdate = this.moment(new Date())
       .subtract(7, "days")
       .format("YYYY-MM-DD");

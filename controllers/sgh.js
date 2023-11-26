@@ -339,7 +339,7 @@ module.exports = (connection) => {
             let dateFrom = moment(fromdate).format('YYYY-MM-DD hh:mm:ss');
             let dateTo = moment(date).add(1, 'd').format('YYYY-MM-DD') + ' 23:59:59';
 
-            // console.log(dateTo);
+            console.log(dateTo);
 
             let sql = `SELECT DISTINCT([LabNumber]) AS [LabNumber], [DOB], [Gendar],
             [OrderID], [PatientType], [HospitalCode], [BillNo], [PatientID], [PatientName] 
@@ -348,6 +348,7 @@ module.exports = (connection) => {
             AND [labOrder].[DateTimeCollected] >= CAST('${dateFrom}' AS DATE)
             AND [labOrder].[DateTimeCollected] <= CAST('${dateTo}' AS DATE)`;
             console.log(sql);
+
             let records = await connection.query(sql, { type: Sequelize.QueryTypes.SELECT});
 
             let lines = [];
@@ -355,9 +356,11 @@ module.exports = (connection) => {
             for ( let record of records ) {
 
                 let sql = `SELECT DISTINCT([TestID]) AS [TestID], [DateTimeCollected]
-                FROM [IPOP_LABORDERS] AS [labOrder] WHERE [labOrder].[LabNumber] = ${record.LabNumber}                    
+                FROM [IPOP_LABORDERS] AS [labOrder] WHERE [labOrder].[LabNumber] = '${record.LabNumber}'                    
                 AND [labOrder].[DateTimeCollected] >= CAST('${dateFrom}' AS DATE)
                 AND [labOrder].[DateTimeCollected] <= CAST('${dateTo}' AS DATE)`;
+
+                console.log(sql);
 
                 let tests = await connection.query(sql, { type: Sequelize.QueryTypes.SELECT});
 

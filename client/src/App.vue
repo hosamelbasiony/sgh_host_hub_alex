@@ -46,9 +46,15 @@ export default {
     // http://localhost:8003/api/sgh/by-order-id/8
     // axios.get(`${process.env.VUE_APP_API_URL}sgh/params`)
 
+    let url = `${process.env.VUE_APP_PARAMS_API_URL}`;
+    if (process.env.NODE_ENV == "development")
+      url = `${process.env.VUE_APP_API_URL}sgh/params`;
+
     try {
-      let ret = await axios.get(`${process.env.VUE_APP_PARAMS_API_URL}`);
+      let ret = await axios.get(url);
       let data = ret.data;
+
+      if (process.env.NODE_ENV == "development") data = data.parameters;
 
       data.parameters = data.map(x => ({
         ParameterID: x.parameterID,
@@ -57,7 +63,7 @@ export default {
         ParameterName: "",
         UnitName: ""
       }));
-      
+
       this.setParams(data);
     } catch (error) {
       console.error(error);

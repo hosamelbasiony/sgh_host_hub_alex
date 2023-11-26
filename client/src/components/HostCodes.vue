@@ -6,6 +6,10 @@
           Host code
         </v-card-title>
 
+        <!-- <pre>
+          {{ JSON.stringify(currentCode, null, 3) }}
+        </pre> -->
+
         <v-card-text>
           <v-text-field
             :value="currentCode.paramName"
@@ -181,12 +185,13 @@ export default {
     },
     items() {
       console.log("****PARAMS****", this.params)
-      return this.params.parameters.map((entry) => {
+      return this.params.map((entry) => {
+      // return this.params.parameters.map((entry) => {
         // const Description = entry.Description.length > this.descriptionLimit
         //   ? entry.Description.slice(0, this.descriptionLimit) + '...'
         //   : entry.Description
 
-        const Description = entry.ParameterName;
+        const Description = entry.parameterName;
 
         return Object.assign({}, entry, { Description });
       });
@@ -203,8 +208,8 @@ export default {
   watch: {
     // params() {
     //   for ( let code of this.device.deviceCodes ) {
-    //     let fltered = this.params.parameters.find( x => x.ParameterID == code.paramId );
-    //     if ( fltered ) code.paramName = fltered.ParameterName;
+    //     let fltered = this.params.parameters.find( x => x.parameterID == code.paramId );
+    //     if ( fltered ) code.paramName = fltered.parameterName;
     //   }
 
     //   this.$forceUpdate();
@@ -223,6 +228,9 @@ export default {
         // updatedAt: "2019-10-24T00:17:00.692Z"
         // upload: true
 
+
+        // {parameterID: 5, parameterName: "HCO3 (act)", testID: 1, unitId: 11, unitName: "[mmol/L]"}
+
         let code = {
           id: 0,
           uid: uuidv1(),
@@ -230,8 +238,8 @@ export default {
           download: true,
           upload: true,
           hostCode: "",
-          paramId: this.model.ParameterID,
-          paramName: this.model.ParameterName,
+          paramId: this.model.parameterID,
+          paramName: this.model.parameterName,
         };
 
         this.setBusy(true);
@@ -380,8 +388,8 @@ export default {
     // TestName: "METHOTREXATE"
     // id: 1354
 
-    // ParameterID: 5
-    // ParameterName: "HCO3 (act)"
+    // parameterID: 5
+    // parameterName: "HCO3 (act)"
     // TestID: 1
     // UnitId: 11
     // UnitName: "[mmol/L]"
