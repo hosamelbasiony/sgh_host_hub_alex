@@ -129,14 +129,13 @@ connection.sync().then( async() => {
         console.log(('Middleware app server 2 started at http://localhost:' + port).blue);
         startIO();
  
-        advia560.start(io, connection, sghConnection);
+        // advia560.start(io, connection, sghConnection);
         // archi.start(io, connection, sghConnection);
-        ca600.start(io, connection, sghConnection);  
+        // ca600.start(io, connection, sghConnection);  
         // abl800.start(io, connection, sghConnection);
-        e411.start(io, connection, sghConnection);
-        sysmex_urine.start(io, connection, sghConnection);
-        
-        dimension.start(io, connection, sghConnection);
+        // e411.start(io, connection, sghConnection);
+        sysmex_urine.start(io, connection, sghConnection);        
+        // dimension.start(io, connection, sghConnection);
     });
 });
 

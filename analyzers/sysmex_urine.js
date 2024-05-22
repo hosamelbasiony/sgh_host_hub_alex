@@ -1,23 +1,25 @@
-const net               = require('net');
-const moment            = require('moment');
-const path              = require('path');
-const colors            = require("colors");
-const astm              = require('./astm/utils');
-const fileSystem        = require("fs");
-const Sequelize         = require('sequelize');
-const { Op }            = require('sequelize');
+const net = require('net');
+const moment = require('moment');
+const path = require('path');
+const colors = require("colors");
+const astm = require('./astm/utils');
+const fileSystem = require("fs");
+const Sequelize = require('sequelize');
+const { Op } = require('sequelize');
 
-const config      = require('../config');
-const AstmSocketReader  = require('./astm/reader');
-const AstmSocketParser  = require('./astm/parser');
+const config = require('../config');
+const AstmSocketReader = require('./astm/reader');
+const AstmSocketParser = require('./astm/parser');
 // const Device            = require('../models/device');
 
+const { save, saveResults } = require('./db');
+
 let inDir = path.resolve(process.cwd(), 'log', 'sysmex_u_in.txt');
-let resDir = path.resolve(process.cwd(), 'log', 'sysmex_u_out.txt'); 
+let resDir = path.resolve(process.cwd(), 'log', 'sysmex_u_out.txt');
 
 let device = {
-    _id: '37',
-    id: 37,
+    _id: '64',
+    id: 64,
     name: 'SysmexUrine', //urine
     codes: []
 };
@@ -27,21 +29,21 @@ let connection;
 
 const PORT = 6789;
 
-const SOH  = String.fromCharCode(1);
-const STX  = String.fromCharCode(2);
-const ETX  = String.fromCharCode(3);
-const EOT  = String.fromCharCode(4);
-const ENQ  = String.fromCharCode(5);
-const ACK  = String.fromCharCode(6);
-const LF  = String.fromCharCode(10);
-const VT  = String.fromCharCode(11);
-const CR  = String.fromCharCode(13);
-const EXT  = String.fromCharCode(15);
-const NAK  = String.fromCharCode(21);
-const ETB  = String.fromCharCode(23);
-const FS  = String.fromCharCode(28);
-const GS  = String.fromCharCode(29);
-const RS  = String.fromCharCode(30);
+const SOH = String.fromCharCode(1);
+const STX = String.fromCharCode(2);
+const ETX = String.fromCharCode(3);
+const EOT = String.fromCharCode(4);
+const ENQ = String.fromCharCode(5);
+const ACK = String.fromCharCode(6);
+const LF = String.fromCharCode(10);
+const VT = String.fromCharCode(11);
+const CR = String.fromCharCode(13);
+const EXT = String.fromCharCode(15);
+const NAK = String.fromCharCode(21);
+const ETB = String.fromCharCode(23);
+const FS = String.fromCharCode(28);
+const GS = String.fromCharCode(29);
+const RS = String.fromCharCode(30);
 
 
 let toRequesition = [];
@@ -50,14 +52,14 @@ let msgtosend = [];
 const dateString = (extended = true) => {
     let d = new Date();
     d.setHours(d.getHours() - 2);
-	
-	let ret = d.getFullYear();
-    ret += (d.getMonth()+1+'').length == 2 ? d.getMonth()+1+'' : '0' + (d.getMonth()+1)+''
-    ret += (d.getDate()+'').length == 2 ? d.getDate()+'' : '0' + d.getDate()+''
-    
-    if ( extended ) ret += (d.getHours()+'').length == 2 ? d.getHours()+'' : '0' + d.getHours()+''
-    if ( extended ) ret += (d.getMinutes()+'').length == 2 ? d.getMinutes()+'' : '0' + d.getMinutes()+''
-    if ( extended ) ret += (d.getSeconds()+'').length == 2 ? d.getSeconds()+'' : '0' + d.getSeconds()+''
+
+    let ret = d.getFullYear();
+    ret += (d.getMonth() + 1 + '').length == 2 ? d.getMonth() + 1 + '' : '0' + (d.getMonth() + 1) + ''
+    ret += (d.getDate() + '').length == 2 ? d.getDate() + '' : '0' + d.getDate() + ''
+
+    if (extended) ret += (d.getHours() + '').length == 2 ? d.getHours() + '' : '0' + d.getHours() + ''
+    if (extended) ret += (d.getMinutes() + '').length == 2 ? d.getMinutes() + '' : '0' + d.getMinutes() + ''
+    if (extended) ret += (d.getSeconds() + '').length == 2 ? d.getSeconds() + '' : '0' + d.getSeconds() + ''
 
     return ret;
 };
@@ -65,133 +67,23 @@ const dateString = (extended = true) => {
 const dateString2 = (hours = true, minutes = true, seconds = true) => {
     let d = new Date();
     let ret = d.getFullYear();
-    ret += (d.getMonth()+1+'').length == 2 ? d.getMonth()+1+'' : '0' + (d.getMonth()+1)+''
-    ret += (d.getDate()+'').length == 2 ? d.getDate()+'' : '0' + d.getDate()+''
-    
-    if ( hours ) ret += (d.getHours()+'').length == 2 ? d.getHours()+'' : '0' + d.getHours()+''
-    if ( minutes ) ret += (d.getMinutes()+'').length == 2 ? d.getMinutes()+'' : '0' + d.getMinutes()+''
-    if ( seconds ) ret += (d.getSeconds()+'').length == 2 ? d.getSeconds()+'' : '0' + d.getSeconds()+''
+    ret += (d.getMonth() + 1 + '').length == 2 ? d.getMonth() + 1 + '' : '0' + (d.getMonth() + 1) + ''
+    ret += (d.getDate() + '').length == 2 ? d.getDate() + '' : '0' + d.getDate() + ''
+
+    if (hours) ret += (d.getHours() + '').length == 2 ? d.getHours() + '' : '0' + d.getHours() + ''
+    if (minutes) ret += (d.getMinutes() + '').length == 2 ? d.getMinutes() + '' : '0' + d.getMinutes() + ''
+    if (seconds) ret += (d.getSeconds() + '').length == 2 ? d.getSeconds() + '' : '0' + d.getSeconds() + ''
 
     return ret;
 };
 
-const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
-    
-    try {
-        
-        // let SidParams = lab_id_.split("^");
-        // let lab_id = SidParams[2];
-        // let POS = SidParams[3] + "^" + SidParams[4] + "^" + SidParams[5] + "^^" + SidParams[7] + "^" + SidParams[8];
+const requestMessage = async (lab_id, socket, orderType = 'Q') => {};
 
+const requestInfo = async (lab_id, socket) => {
 
-        ///////////////////////////////////////////////////////////////////////////////////////
-        /////// DB Requisition ////////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////////////////////////////
-        let LabNumber = lab_id.toString().replace(/^0+/, '');
-        LabNumber = LabNumber.replace(/^0+/, '');
-        LabNumber = LabNumber.replace(/@/, '');
-        
-        const analyzerParamList = await connection.models.deviceCode.findAll({
-            where: {
-                download: true,
-                deviceId: device.id,
-            }
-        });    
-
-        // console.log(analyzerParamList);
-
-        let inStatement = [0, ...analyzerParamList.map( x => x.paramId+'' )].join(',');
-
-        console.log(inStatement);
-
-        let sql = `SELECT * FROM IPOP_LABORDERS 
-        WHERE LabNumber = ${LabNumber} AND ParameterID IN (${inStatement})`;
-
-        console.log(sql);
-        // return;
-
-        const results = await sgh.query(sql, { type: Sequelize.QueryTypes.SELECT});
-                
-        let ret = [];
-        let patientName = '';
-        let patientId = '';
-        let gender = '';
-        let DOB = '19800122';
-        // var now = moment("2016-03-08 16:33:12.000").format('YYYYMMDD');
-        // alert(now);
-        
-        if ( results.length ) {
-            patientName = results[0].PatientName;
-            gender = results[0].Gendar;
-            patientId = results[0].PatientId;
-            DOB = moment(results[0].DOB).format('YYYYMMDD')
-        
-            let paramIdList = results.map ( x => x.ParameterId );    
-        
-            let codesToSend =  analyzerParamList.filter ( x => x.download && paramIdList.includes(parseInt(x.paramId)) );
-        
-            for ( let param of codesToSend )  if ( ret.indexOf(param.hostCode ) == -1 ) ret = [...ret, param.hostCode];     
-
-        }
-
-        ret = { codes: ret, patientId, patientName };
-        ///////////////////////////////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////////////////////////////
-        
-        // console.log(JSON.stringify(ret,undefined,4));
-
-        let codes = ret.codes;
-        let [name1, name2, name3] = ret.patientName.split(' '); 
-
-        let pName = ret.patientName.split(" ").slice(0, 3).join("^");
-
-        let LabPID =  ret.patientId;
-        
-        let PatientDOB =  '19780727';
-        let PatientGender =  gender == 'Male'? 'M':'F';
-        let Referral =  '';
-        let Location =  'SGHC01';
-
-        // let TestRequest = codes.map(x => '^^^'+x).join('^\\') + '^';
-        let TestRequest = codes.map(x => '^^^'+x).join('\\') ;
-        // ^^^10^Test10^protocol1
-        
-        msgtosend = [];
-
-        let record = `${STX}1H|\\^&||||||||||P|1${CR}${ETX}`;
-        record = record + astm.checksum(record) + `${CR}${LF}`;
-        msgtosend = [...msgtosend, record];
-
-        // record    = `${STX}2P|1||${LabNumber}||Doe^Jane^Q||19800122|F|||||Dr. Al-Basiony||||||||||||SGH${CR}${ETX}`;
-        record    = `${STX}2P|1||${LabPID}||${pName}||${DOB}|${PatientGender}|||||Dr. Al-Basiony||||||||||||SGH${CR}${ETX}`;
-        record = record + astm.checksum(record) + `${CR}${LF}`;
-        msgtosend = [...msgtosend, record];
-
-        // record    = `${STX}3O|1|${LabNumber}||^^^2839\\^^^2002\\^^^1096|||${dateString()}||||A|Hep|lipemic||serum||||||||||${orderType}${CR}${ETX}`;
-        record    = `${STX}3O|1|${LabNumber}||${TestRequest}|||${dateString()}||||A||||serum||||||||||${orderType}${CR}${ETX}`;
-        record = record + astm.checksum(record) + `${CR}${LF}`;
-        msgtosend = [...msgtosend, record];
-        
-        record    = `${STX}4L|1|${CR}${ETX}`;
-        record = record + astm.checksum(record) + `${CR}${LF}`;
-        msgtosend = [...msgtosend, record];
-
-        msgtosend.reverse();
-        
-        fileSystem.appendFile('./log/sysmx_urine_out.txt', msgtosend[0].toString(), err => {});  
-
-        if ( socket ) socket.write(ENQ);
-
-    } catch(ex) {
-        console.log(ex.stack);
-    }
-};
-
-const requestInfo = async ( lab_id, socket ) => {
-    
     let LabNumber = lab_id.toString().replace(/^0+/, '');
     LabNumber = LabNumber.replace(/^0+/, '');
-	LabNumber = LabNumber.replace(/@/, '');
+    LabNumber = LabNumber.replace(/@/, '');
 
     msgtosend = [];
 
@@ -200,38 +92,38 @@ const requestInfo = async ( lab_id, socket ) => {
     // record    += `Q|1|^${LabNumber}||^^^ALL||||||||X${CR}`;
     // record    += `L|1|${CR}${ETX}`;
 
-   
+
 
     let record = `${STX}1H|\\^&||||||||||P|1${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
-    record    = `${STX}2P|1${CR}${ETX}`;
+    record = `${STX}2P|1${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
-    record    = `${STX}3Q|1|^${LabNumber}||^^^ALL||||||||X${CR}${ETX}`;
+    record = `${STX}3Q|1|^${LabNumber}||^^^ALL||||||||X${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
-    
-    record    = `${STX}4L|1|${CR}${ETX}`;
+
+    record = `${STX}4L|1|${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
     msgtosend.reverse();
-    
-    // console.log(msgtosend[0]); 
-    fileSystem.appendFile('./log/sysmex_urine_out.txt', msgtosend[0].toString(), err => {});  
 
-    if ( socket ) socket.write(ENQ);
+    // console.log(msgtosend[0]); 
+    fileSystem.appendFile('./log/sysmex_urine_out.txt', msgtosend[0].toString(), err => { });
+
+    if (socket) socket.write(ENQ);
 };
 
-const server = net.createServer( (socket) => {
+const server = net.createServer((socket) => {
     socket.setEncoding();
 
     console.log('Sysmex-urine client connected to port ' + PORT);
 
-    socket.on ( 'error', err => console.log(`${moment(new Date()).format("YYYY-MM-DD hh:mm:ss")} Archi: Socket error`, err.stack) );
+    socket.on('error', err => console.log(`${moment(new Date()).format("YYYY-MM-DD hh:mm:ss")} Archi: Socket error`, err.stack));
 
 
     let reader = new AstmSocketReader(socket, inDir);
@@ -239,46 +131,42 @@ const server = net.createServer( (socket) => {
 
     // console.log('parser set to value')
 
-    reader.on ( 'data', data => {
-    
-    	console.log(data);
-    
+    reader.on('data', data => {
+        console.log(data);
+
         toRequesition = [];
         parser.parse(data, device);
     });
-    reader.on ( 'enquired', _ => msgtosend = [] );
-    reader.on ( 'negativeacknowledged', _ => msgtosend = [] );
-    reader.on ( 'acknowledged', _ => { 
-    	console.log("ACK");
-        if ( msgtosend.length ) {
+    reader.on('enquired', _ => msgtosend = []);
+    reader.on('negativeacknowledged', _ => msgtosend = []);
+    reader.on('acknowledged', _ => {
+        console.log("ACK");
+        if (msgtosend.length) {
             let msg = msgtosend.pop();
             console.dir(`sending: ${msg}`.yellow);
             socket.write(msg);
-            fileSystem.appendFile('./data/archi_out.txt', msg.toString(), err => {});  
+            fileSystem.appendFile('./data/archi_out.txt', msg.toString(), err => { });
             // reader.write(msg);
         } else {
             // reader.write(EOT);
             socket.write(EOT);
-            console.log('EOT'.yellow); 
-            
-            if ( toRequesition.length ) {
+            console.log('EOT'.yellow);
+
+            if (toRequesition.length) {
                 let sid = toRequesition.pop();
-                
-                
-                
                 requestMessage(sid, socket);
             }
         }
     });
 
-    parser.on( 'requisition', sid => {
-        console.log(sid+ " to request");
+    parser.on('requisition', sid => {
+        console.log(sid + " to request");
         toRequesition = [...toRequesition, sid]
     });
-    parser.on( 'results', results => saveResult(results) );
-    parser.on( 'startDownload', _ => {
+    parser.on('results', results => saveResults(device, results));
+    parser.on('startDownload', _ => {
         console.log('startDownload' + JSON.stringify(toRequesition, undefined, 4));
-        if ( toRequesition.length ) {
+        if (toRequesition.length) {
             let sid = toRequesition.pop();
             requestMessage(sid, socket);
         }
@@ -289,69 +177,6 @@ const server = net.createServer( (socket) => {
 
 });
 
-const saveResult = async result  => {
-
-	// if( Math.random() > 0.5 ) return;
-
-    try {
-
-        console.log(JSON.stringify(result, undefined, 2));
-    
-    	if(  new Date() != null ) return;
-
-        let resultList = result;
-        let deviceId = device.id;
-
-        let userId = config.userId; //10137; // req.params.userId;
-        
-        let LabNumber = resultList.sampleid;
-
-        for ( let line of resultList.lines ) {
-
-            let query  = `select * from IPOP_LABORDERS where LabNumber = ${LabNumber} and ParameterID = ${line.parameterId}`;
-            let results = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT});
-
-            console.log(query);
-
-            let Status = 0; // from tarqeem
-            let UserID = userId; // from tarqeem
-            let EquipmentID = 26; //deviceId; // from tarqeem added manually    
-
-            line.unit = line.unit || '';
-
-            if ( results.length ) {
-
-                let PatientType = results[0].PatientType;
-                let OrderID = results[0].OrderID;
-                let TestID = results[0].TestID;
-
-
-                let query  = `select * from Lab_Results where OrderID = ${OrderID} 
-                            and LabNumber = ${LabNumber} and ParameterID = ${line.parameterId} and TestID = ${TestID}`;
-                let results2 = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT});
-
-                console.log(query);
-
-                if ( !results2.length || 1 ) {
-                    
-                    let query  = `insert into Lab_Results 
-                    (OrderID, LabNumber, ParameterID, TestID, Result, EquipmentID, UserID, Status, PatientType, UnitName) 
-                    values ('${OrderID}', '${LabNumber}', '${line.parameterId}', 
-                    '${TestID}', '${line.result}', '${EquipmentID}', '${UserID}', 
-                    '${Status}', '${PatientType}', '${line.unit}')`;
-
-                    console.log(query);
-
-                    await sgh.query(query, { type: Sequelize.QueryTypes.INSERT});
-                }             
-            } 
-
-        }
-    } catch(ex) {
-        console.log(ex.stack);
-    }
-    
-};
 
 exports.start = (io, conn, sghConn) => {
 
@@ -360,21 +185,119 @@ exports.start = (io, conn, sghConn) => {
 
     server.listen(PORT, () => {
         console.log(`\nSysmex-urine host tcp server listening on ${PORT} `.bgMagenta);
-        
         // test(conn, sgh);
-    }); 
+        // setTimeout(testClient, 2000);
+    });
 };
+
+const testClient = () => {
+    let msg = `1H|^&|||U-WAM^00-22_Build003^A5912^^^^AU501736||||||||LIS2-A2|20231212111250
+    72
+    2P|1|||||||U
+    F8
+    3O|1|44014||^^^RBC^^^EC^^^Squa.EC^^^Non SEC^^^CAST^^^BACT^^^X'TAL^^^YLC^^^SPERM^^^MUCUS^^^WBC^^^WBC Clumps^^^RBC-Info.^^^UTI-Info.^^^BACT-Info.^^^SF_DSS_PxSF_FSC_P^^^CB_FLH_PxCB_FSC_P|R||20231212110244||||N|||20231212110244|2D
+    4*||||||||||F
+    8C
+    5R|1|^^^RBC^A^1^S|48.9^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    0E
+    6R|2|^^^RBC^A^1^S|6-10/HPF^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    C2
+    7R|3|^^^EC^A^1^S|8.5^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    8B
+    0R|4|^^^EC^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    81
+    1R|5|^^^Squa.EC^A^1^S|2.0^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    44
+    2R|6|^^^Squa.EC^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    4D
+    3R|7|^^^Non SEC^A^1^S|6.5^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    27
+    4R|8|^^^Non SEC^A^1^S|1+^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    A0
+    5R|9|^^^CAST^A^1^S|0.80^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    5D
+    6R|10|^^^CAST^A^1^S|NIL/LPF^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    68
+    7R|11|^^^BACT^A^1^S|27.9^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    81
+    0R|12|^^^BACT^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    42
+    1R|13|^^^X'TAL^A^1^S|0.0^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    81
+    2R|14|^^^X'TAL^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    8C
+    3R|15|^^^YLC^A^1^S|0.5^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    12
+    4R|16|^^^YLC^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    18
+    5R|17|^^^SPERM^A^1^S|0.0^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    B0
+    6R|18|^^^SPERM^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    BB
+    7R|19|^^^MUCUS^A^1^S|0.53^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    F2
+    0R|20|^^^MUCUS^A^1^S|NIL^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    B4
+    1R|21|^^^WBC^A^1^S|54.3^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    38
+    2R|22|^^^WBC^A^1^S|6-10/HPF^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    F5
+    3R|23|^^^WBC Clumps^A^1^S|1.4^RAW|/�l||N||||^^device||20231212111143|UF-5000
+    99
+    4R|24|^^^WBC Clumps^A^1^S|Absent^MAINFORMAT|||N||||^^device||20231212111143|UF-5000
+    19
+    5R|25|^^^RBC-Info.^A^1^S|1^RAW|||||||^^device||20231212111143|UF-5000
+    EB
+    6R|26|^^^RBC-Info.^A^1^S|1^MAINFORMAT|||||||^^device||20231212111143|UF-5000
+    F1
+    7R|27|^^^UTI-Info.^A^1^S|1^RAW|||||||^^device||20231212111143|UF-5000
+    0A
+    0R|28|^^^UTI-Info.^A^1^S|1^MAINFORMAT|||||||^^device||20231212111143|UF-5000
+    08
+    1R|29|^^^BACT-Info.^A^1^S|0^RAW|||||||^^device||20231212111143|UF-5000
+    2D
+    2R|30|^^^BACT-Info.^A^1^S|0^MAINFORMAT|||||||^^device||20231212111143|UF-5000
+    2A
+    3R|31|^^^SF_DSS_PxSF_FSC_P^A^1^IF|20231212&R&PNG&E&R&E&[UF-5000&S&14894]&E&[20231212_111143]&E&R&E&[STAT000000000000000001]_[SF_DSS_PxSF_FSC_P].png^RAW|||||||^^device||20231212111143|UF-5000
+    70
+    4R|32|^^^CB_FLH_PxCB_FSC_P^A^1^IF|20231212&R&PNG&E&R&E&[UF-5000&S&14894]&E&[20231212_111143]&E&R&E&[STAT000000000000000001]_[CB_FLH_PxCB_FSC_P].png^RAW|||||||^^device||20231212111143|UF-5000
+    02
+    5L|1|N
+    08
+    `;
+
+    let messages = msg.split(STX);    
+
+    var client = new net.Socket();
+    client.connect(PORT, '127.0.0.1', function () {
+        console.log('Connected');
+        client.write(ENQ);
+
+        for (let frame of messages ) {
+            client.write(STX + frame);
+        }
+    });
+
+    client.on('data', function (data) {
+        // console.log('Received: ' + data);
+        client.destroy(); // kill client after server's response
+    });
+
+    client.on('close', function () {
+        console.log('Connection closed');
+    });
+}
 
 const test = (connection, sgh) => {
 
     let parser = new AstmSocketParser({}, device, connection, sgh);
-    parser.on( 'results', results => saveResult(results) );
-    parser.on( 'requisition', sid => {
-        console.log(sid+ " to request");
+    parser.on('results', results => saveResults(device, results));
+    parser.on('requisition', sid => {
+        console.log(sid + " to request");
         // toRequesition = [...toRequesition, sid]
         // requestMessage ( sid , null, connection, sgh );
     });
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // test data ///////////////////////////////////////////////////////////////////////////////////
     let data = `1H|\^&|||U-WAM^00-22_Build003^A5912^^^^AU501736||||||||LIS2-A2|20231019110350

@@ -39,7 +39,7 @@ class AstmSocketParser extends EventEmitter {
 
     async parse(msg, device) {
 
-        console.log(('parsing: ' + msg).cyan);
+        // console.log(('parsing: ' + msg).cyan);
 
         let msgTypeIsQuery = false;
 
@@ -52,21 +52,17 @@ class AstmSocketParser extends EventEmitter {
         };
 
         let astmLines = msg.split(CR);
+    	if( astmLines.length == 1 ) astmLines = msg.split("\n");
         if (device.name == 'CA-600') {
             //astmLines = msg.match(/\d.\|.*\|/g);
             //console.log(JSON.stringify(astmLines, undefined, 2));
         }
 
-        // if ( device.name == 'CA-600' ) astmLines = msg.split('\n');	
-
-        // console.log(JSON.stringify(astmLines, undefined, 2));
-        // return;
-
         if (astmLines) {
 
             for (let line of astmLines) {
 
-                console.log(line);
+                console.log((line).cyan);
 
                 let fields = line.split("|");
 
@@ -140,7 +136,7 @@ class AstmSocketParser extends EventEmitter {
                             else if (this.device.name == 'CA-600') sid = line.split("|")[3].split('^')[2].trim();
                             // else if ( this.device.name == 'ABL' ) sid = line.split("|")[3].split('^')[1];
                             else if (this.device.name == 'Gem') sid = line.split("|")[3];
-                            // else if ( this.device.name == 'Stago' ) sid = line.split("|")[3].split('^')[2];
+                            else if ( this.device.name == 'XN530' ) sid = line.split("|")[3].split('^')[2].trim();
                             else sid = line.split("|")[2].replace('^', '').trim();
                         } catch (ex) {
                             console.log(JSON.stringify(ex, undefined, 2));
@@ -168,6 +164,7 @@ class AstmSocketParser extends EventEmitter {
                         else if (this.device.name == 'Gem') code = line.split("|")[2].split('^')[3];
                         else if (this.device.name == 'ABL') code = line.split("|")[2].split('^')[3];
                         else if (this.device.name == 'Stago') code = line.split("|")[2].split('^')[3];
+                        else if (this.device.name == 'XN530') code = line.split("|")[2].split('^')[4];
                         else code = line.split("|")[2].split('^')[3].split('/')[0];
 
                         // console.log("code", code);
@@ -228,9 +225,8 @@ class AstmSocketParser extends EventEmitter {
         if (msgTypeIsQuery) this.emit("startDownload", {});
         else {
 
-            if (result.lines.length) this.emit("results", result);
-
-            console.log(JSON.stringify(result, undefined, 2).yellow);
+            console.log("EMITTED RESULT: ", JSON.stringify(result, undefined, 2).yellow);
+        	if (result.lines.length) this.emit("results", result);
 
             // result.lines = await mssql.getFilteredParams( result.sid, result.lines );
             // console.log(JSON.stringify(result, undefined, 4));

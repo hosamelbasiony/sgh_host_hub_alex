@@ -5,7 +5,8 @@ const colors = require("colors");
 const astm = require('./astm/utils');
 const fileSystem = require("fs");
 
-const { saveResult, reqCodes } = require('./db');
+// const { saveResult, reqCodes } = require('./db');
+const { saveResults, reqCodes }      = require('./db');
 
 let device = {
     _id: '14',
@@ -68,7 +69,7 @@ const server = net.createServer((socket) => {
     
     socket.on('data', data => {
         data = data.toString();
-        console.log(data);
+        // console.log(data);
 
         fileSystem.appendFile('./log/dimension_in.txt', data + "\n\n", err => { });
         
@@ -84,6 +85,7 @@ const server = net.createServer((socket) => {
 });
 
 // Declaration
+let  testRequest = []; //  [`${STX}D${FS}0${FS}0${FS}A${FS}Doe,John${FS}012345${FS}2${FS}${FS}0${FS}1${FS}**${FS}1${FS}2${FS}BUN${FS}CRE2${FS}`];
 class Message {
     // First Poll -          <STX>P<FS>92300<FS>1<FS>1<FS>0<FS>6C<ETX>
     // Conversational Poll - <STX>P<FS>92300<FS>0<FS>1<FS>0<FS>6B<ETX>
@@ -92,6 +94,7 @@ class Message {
     type = "";
     deviceReady = false;
     noRequest = `${STX}N${FS}6A${ETX}`;
+    resultAcceptence = `${STX}M${FS}A${FS}${FS}E2${ETX}`;
     request = "";
     poll = ""
     sid = ""
@@ -99,12 +102,18 @@ class Message {
 
     constructor(socket) {
         this.socket = socket;
+
+        this.resultAcceptence = `${STX}M${FS}A${FS}${FS}`;
+        this.resultAcceptence += astm.checksum(this.resultAcceptence) + ETX;
+        // console.log(this.resultAcceptence)
     }
 
     async delay(msg) {
         setTimeout(() => {
             // no request
+            // console.log(("SENDING: " + msg).cyan )
             this.socket.write(msg);
+            fileSystem.appendFile('./log/dimension_out.txt', msg + "\n", err => { });
         }, 500);
     }
 
@@ -130,15 +139,18 @@ class Message {
 
         console.log("TYPE:", this.type);
 
-        this.socket.write(ACK);
+        setTimeout(() => {
+            this.socket.write(ACK);
+        }, 250);
 
         if (this.type == "I") {
+            // <STX>I<FS>043092011<FS>45<ETX>
             // <STX>I<FS>043092011<FS>45<ETX>
             this.sid = parts[1];
             let ret = await reqCodes(device, this.sid);
             // { codes, patientId, patientName };
             
-            console.log(JSON.stringify(ret, null, 4))
+            // console.log(JSON.stringify(ret, null, 4))
             this.generateRequest(ret);
             // this.generateRequest(ret.codes);
 
@@ -154,17 +166,20 @@ class Message {
             // <FS><FS>11<FS>EC02
             // <FS><FS><FS>11<FS>CRE2<FS>0.2<FS>mg/dL<FS>3<FS>CB<ETX></ETX>
 
+            // R*MARIAM MOHAMED13858910565821 11223112RCRP9HIL111IndE8
+
             let numberOfTests = Number(parts[10]);
             this.sid = parts[3];
             this.lines = [];
 
-            console.log("numberOfTests", numberOfTests)
+            // console.log("numberOfTests", numberOfTests)
 
             for ( let i=0; i<numberOfTests; i+= 4 ) {
                 this.lines.push({
                     hostcode: parts[11 + i],
                     code: parts[11 + i],
-                    result: parts[12 + i]
+                    result: parts[12 + i],
+                    error: parts[14 + i]
                 });
             }
 
@@ -177,11 +192,46 @@ class Message {
                 deviceid: device.id,
                 lines: this.lines
             };
+
+            this.delay(this.resultAcceptence);
+
+            console.log(JSON.stringify(result, null, 3))
             
-            saveResult(device, result);
+            saveResults(device, result);
+        } else if (this.type == "C") {
+            // let numberOfTests = Number(parts[10]);
+            // this.sid = parts[3];
+            // this.lines = [];
+
+
+            // for ( let i=0; i<numberOfTests; i+= 4 ) {
+            //     this.lines.push({
+            //         hostcode: parts[11 + i],
+            //         code: parts[11 + i],
+            //         result: parts[12 + i],
+            //         error: parts[14 + i]
+            //     });
+            // }
+
+            // console.log(JSON.stringify(this.lines, null, 3));
+
+            // let result = {
+            //     sid: this.sid,
+            //     sampleid: this.sid,
+            //     devicename: device.name,
+            //     deviceid: device.id,
+            //     lines: this.lines
+            // };
+
+            this.delay(this.resultAcceptence);
+
+            // console.log(JSON.stringify(result, null, 3))
+            
+            // saveResults(device, result);
             
         } else if (this.type == "P") {
-            this.deviceReady = parts[3] == 1;
+            // Pdim1110D9
+            this.deviceReady = (parts[3] == 1);
             this.ID = parts[1];
             if (this.poll == "") {
                 this.poll = `${STX}P${FS}${this.ID}${FS}0${FS}1${FS}`;
@@ -189,8 +239,14 @@ class Message {
             }
 
             if (this.deviceReady) {
-                // no request
-                this.delay(this.noRequest);
+                this.poll += astm.checksum(this.poll) + ETX
+
+                if(testRequest.length) {
+                    let request = testRequest[0]
+                    request += astm.checksum(request) + ETX
+                    this.delay(request);
+                    testRequest = [];
+                } else this.delay(this.noRequest);
             } else {
                 // TODO: revise
                 // this.delay(this.poll);
@@ -221,12 +277,16 @@ exports.start = (io, conn, sghConn) => {
 
 let test = () => {
 
-    let testSample = `${STX}R${FS}0${FS}${FS}715037${FS}1${FS}${FS}0${FS}594513230702${FS}1${FS}1${FS}1${FS}CKI${FS}2590${FS}U/L${FS}3${FS}AE${ETX}`;
+    // let testSample = `${STX}R${FS}0${FS}${FS}715037${FS}1${FS}${FS}0${FS}594513230702${FS}1${FS}1${FS}1${FS}CKI${FS}2590${FS}U/L${FS}3${FS}AE${ETX}`;
+    // let testSample = `R*MARIAM MOHAMED13858910565821 11223112RCRP9HIL111IndE8`;
+    let testSample = `R*MARIAM MOHAMED13858910565821 11223112RCRP9HIL111IndE8`;
+
     // testSample = `${STX}R${FS}0${FS}${FS}1596${FS}1${FS}${FS}0${FS}420111230702${FS}1${FS}1${FS}5${FS}NA${FS}${FS}${FS}11${FS}K${FS}${FS}${FS}11${FS}CL${FS}${FS}${FS}11${FS}EC02${FS}${FS}${FS}11${FS}CRE2${FS}0.2${FS}mg/dL${FS}3${FS}CB${ETX}`;
     //R0151910594513230702111CKI2590U/L3AE
     // fileSystem.appendFile('./log/dimension_test.txt', testSample + "\n\n", err => { });
 
-    let sampleOrder = `${STX}I${FS}715037${FS}45${ETX}`;
+    // let sampleOrder = `${STX}I${FS}715037${FS}45${ETX}`;
+    let sampleOrder = `Pdim1110D9`;
 
     let messages = [
         `${STX}P${FS}92300${FS}1${FS}1${FS}0${FS}6C${ETX}`,

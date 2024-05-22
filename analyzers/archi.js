@@ -1,20 +1,22 @@
-const net               = require('net');
-const moment            = require('moment');
-const path              = require('path');
-const colors            = require("colors");
-const astm              = require('./astm/utils');
-const fileSystem        = require("fs");
-const Sequelize         = require('sequelize');
-const { Op }            = require('sequelize');
+const net = require('net');
+const moment = require('moment');
+const path = require('path');
+const colors = require("colors");
+const astm = require('./astm/utils');
+const fileSystem = require("fs");
+const Sequelize = require('sequelize');
+const { Op } = require('sequelize');
 
-const AstmSocketReader  = require('./astm/reader');
-const AstmSocketParser  = require('./astm/parser');
+const { saveResults, reqCodes } = require('./db');
+
+const AstmSocketReader = require('./astm/reader');
+const AstmSocketParser = require('./astm/parser');
 // const Device            = require('../models/device');
 // const database          = require ('./mssql');
-const config      = require('../config');
+const config = require('../config');
 
 let inDir = path.resolve(process.cwd(), 'log', 'e411_in.txt');
-let resDir = path.resolve(process.cwd(), 'log', 'e411_out.txt'); 
+let resDir = path.resolve(process.cwd(), 'log', 'e411_out.txt');
 
 let device = {
     _id: '4',
@@ -38,21 +40,21 @@ let connection;
 
 const PORT = 2231;
 
-const SOH  = String.fromCharCode(1);
-const STX  = String.fromCharCode(2);
-const ETX  = String.fromCharCode(3);
-const EOT  = String.fromCharCode(4);
-const ENQ  = String.fromCharCode(5);
-const ACK  = String.fromCharCode(6);
-const LF  = String.fromCharCode(10);
-const VT  = String.fromCharCode(11);
-const CR  = String.fromCharCode(13);
-const EXT  = String.fromCharCode(15);
-const NAK  = String.fromCharCode(21);
-const ETB  = String.fromCharCode(23);
-const FS  = String.fromCharCode(28);
-const GS  = String.fromCharCode(29);
-const RS  = String.fromCharCode(30);
+const SOH = String.fromCharCode(1);
+const STX = String.fromCharCode(2);
+const ETX = String.fromCharCode(3);
+const EOT = String.fromCharCode(4);
+const ENQ = String.fromCharCode(5);
+const ACK = String.fromCharCode(6);
+const LF = String.fromCharCode(10);
+const VT = String.fromCharCode(11);
+const CR = String.fromCharCode(13);
+const EXT = String.fromCharCode(15);
+const NAK = String.fromCharCode(21);
+const ETB = String.fromCharCode(23);
+const FS = String.fromCharCode(28);
+const GS = String.fromCharCode(29);
+const RS = String.fromCharCode(30);
 
 
 let toRequesition = [];
@@ -61,14 +63,14 @@ let msgtosend = [];
 const dateString = (extended = true) => {
     let d = new Date();
     d.setHours(d.getHours() - 2);
-	
-	let ret = d.getFullYear();
-    ret += (d.getMonth()+1+'').length == 2 ? d.getMonth()+1+'' : '0' + (d.getMonth()+1)+''
-    ret += (d.getDate()+'').length == 2 ? d.getDate()+'' : '0' + d.getDate()+''
-    
-    if ( extended ) ret += (d.getHours()+'').length == 2 ? d.getHours()+'' : '0' + d.getHours()+''
-    if ( extended ) ret += (d.getMinutes()+'').length == 2 ? d.getMinutes()+'' : '0' + d.getMinutes()+''
-    if ( extended ) ret += (d.getSeconds()+'').length == 2 ? d.getSeconds()+'' : '0' + d.getSeconds()+''
+
+    let ret = d.getFullYear();
+    ret += (d.getMonth() + 1 + '').length == 2 ? d.getMonth() + 1 + '' : '0' + (d.getMonth() + 1) + ''
+    ret += (d.getDate() + '').length == 2 ? d.getDate() + '' : '0' + d.getDate() + ''
+
+    if (extended) ret += (d.getHours() + '').length == 2 ? d.getHours() + '' : '0' + d.getHours() + ''
+    if (extended) ret += (d.getMinutes() + '').length == 2 ? d.getMinutes() + '' : '0' + d.getMinutes() + ''
+    if (extended) ret += (d.getSeconds() + '').length == 2 ? d.getSeconds() + '' : '0' + d.getSeconds() + ''
 
     return ret;
 };
@@ -76,20 +78,20 @@ const dateString = (extended = true) => {
 const dateString2 = (hours = true, minutes = true, seconds = true) => {
     let d = new Date();
     let ret = d.getFullYear();
-    ret += (d.getMonth()+1+'').length == 2 ? d.getMonth()+1+'' : '0' + (d.getMonth()+1)+''
-    ret += (d.getDate()+'').length == 2 ? d.getDate()+'' : '0' + d.getDate()+''
-    
-    if ( hours ) ret += (d.getHours()+'').length == 2 ? d.getHours()+'' : '0' + d.getHours()+''
-    if ( minutes ) ret += (d.getMinutes()+'').length == 2 ? d.getMinutes()+'' : '0' + d.getMinutes()+''
-    if ( seconds ) ret += (d.getSeconds()+'').length == 2 ? d.getSeconds()+'' : '0' + d.getSeconds()+''
+    ret += (d.getMonth() + 1 + '').length == 2 ? d.getMonth() + 1 + '' : '0' + (d.getMonth() + 1) + ''
+    ret += (d.getDate() + '').length == 2 ? d.getDate() + '' : '0' + d.getDate() + ''
+
+    if (hours) ret += (d.getHours() + '').length == 2 ? d.getHours() + '' : '0' + d.getHours() + ''
+    if (minutes) ret += (d.getMinutes() + '').length == 2 ? d.getMinutes() + '' : '0' + d.getMinutes() + ''
+    if (seconds) ret += (d.getSeconds() + '').length == 2 ? d.getSeconds() + '' : '0' + d.getSeconds() + ''
 
     return ret;
 };
 
-const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
-    
+const requestMessage = async (lab_id, socket, orderType = 'Q') => {
+
     try {
-        
+
         // let SidParams = lab_id_.split("^");
         // let lab_id = SidParams[2];
         // let POS = SidParams[3] + "^" + SidParams[4] + "^" + SidParams[5] + "^^" + SidParams[7] + "^" + SidParams[8];
@@ -101,17 +103,17 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
         let LabNumber = lab_id.toString().replace(/^0+/, '');
         LabNumber = LabNumber.replace(/^0+/, '');
         LabNumber = LabNumber.replace(/@/, '');
-        
+
         const analyzerParamList = await connection.models.deviceCode.findAll({
             where: {
                 download: true,
                 deviceId: device.id,
             }
-        });    
+        });
 
         // console.log(analyzerParamList);
 
-        let inStatement = [0, ...analyzerParamList.map( x => x.paramId+'' )].join(',');
+        let inStatement = [0, ...analyzerParamList.map(x => x.paramId + '')].join(',');
 
         console.log(inStatement);
 
@@ -121,8 +123,8 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
         console.log(sql);
         // return;
 
-        const results = await sgh.query(sql, { type: Sequelize.QueryTypes.SELECT});
-                
+        const results = await sgh.query(sql, { type: Sequelize.QueryTypes.SELECT });
+
         let ret = [];
         let patientName = '';
         let patientId = '';
@@ -130,43 +132,43 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
         let DOB = '19800122';
         // var now = moment("2016-03-08 16:33:12.000").format('YYYYMMDD');
         // alert(now);
-        
-        if ( results.length ) {
+
+        if (results.length) {
             patientName = results[0].PatientName;
             gender = results[0].Gendar;
             patientId = results[0].PatientId;
             DOB = moment(results[0].DOB).format('YYYYMMDD')
-        
-            let paramIdList = results.map ( x => x.ParameterId );    
-        
-            let codesToSend =  analyzerParamList.filter ( x => x.download && paramIdList.includes(parseInt(x.paramId)) );
-        
-            for ( let param of codesToSend )  if ( ret.indexOf(param.hostCode ) == -1 ) ret = [...ret, param.hostCode];     
+
+            let paramIdList = results.map(x => x.ParameterId);
+
+            let codesToSend = analyzerParamList.filter(x => x.download && paramIdList.includes(parseInt(x.paramId)));
+
+            for (let param of codesToSend) if (ret.indexOf(param.hostCode) == -1) ret = [...ret, param.hostCode];
 
         }
 
         ret = { codes: ret, patientId, patientName };
         ///////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////
-        
+
         // console.log(JSON.stringify(ret,undefined,4));
 
         let codes = ret.codes;
-        let [name1, name2, name3] = ret.patientName.split(' '); 
+        let [name1, name2, name3] = ret.patientName.split(' ');
 
         let pName = ret.patientName.split(" ").slice(0, 3).join("^");
 
-        let LabPID =  ret.patientId;
-        
-        let PatientDOB =  '19780727';
-        let PatientGender =  gender == 'Male'? 'M':'F';
-        let Referral =  '';
-        let Location =  'SGHC01';
+        let LabPID = ret.patientId;
+
+        let PatientDOB = '19780727';
+        let PatientGender = gender == 'Male' ? 'M' : 'F';
+        let Referral = '';
+        let Location = 'SGHC01';
 
         // let TestRequest = codes.map(x => '^^^'+x).join('^\\') + '^';
-        let TestRequest = codes.map(x => '^^^'+x).join('\\') ;
+        let TestRequest = codes.map(x => '^^^' + x).join('\\');
         // ^^^10^Test10^protocol1
-        
+
         msgtosend = [];
 
         let record = `${STX}1H|\\^&||||||||||P|1${CR}${ETX}`;
@@ -174,35 +176,35 @@ const requestMessage = async ( lab_id, socket, orderType = 'Q' ) => {
         msgtosend = [...msgtosend, record];
 
         // record    = `${STX}2P|1||${LabNumber}||Doe^Jane^Q||19800122|F|||||Dr. Al-Basiony||||||||||||SGH${CR}${ETX}`;
-        record    = `${STX}2P|1||${LabPID}||${pName}||${DOB}|${PatientGender}|||||Dr. Al-Basiony||||||||||||SGH${CR}${ETX}`;
+        record = `${STX}2P|1||${LabPID}||${pName}||${DOB}|${PatientGender}|||||Dr. Al-Basiony||||||||||||SGH${CR}${ETX}`;
         record = record + astm.checksum(record) + `${CR}${LF}`;
         msgtosend = [...msgtosend, record];
 
         // record    = `${STX}3O|1|${LabNumber}||^^^2839\\^^^2002\\^^^1096|||${dateString()}||||A|Hep|lipemic||serum||||||||||${orderType}${CR}${ETX}`;
-        record    = `${STX}3O|1|${LabNumber}||${TestRequest}|||${dateString()}||||A||||serum||||||||||${orderType}${CR}${ETX}`;
+        record = `${STX}3O|1|${LabNumber}||${TestRequest}|||${dateString()}||||A||||serum||||||||||${orderType}${CR}${ETX}`;
         record = record + astm.checksum(record) + `${CR}${LF}`;
         msgtosend = [...msgtosend, record];
-        
-        record    = `${STX}4L|1|${CR}${ETX}`;
+
+        record = `${STX}4L|1|${CR}${ETX}`;
         record = record + astm.checksum(record) + `${CR}${LF}`;
         msgtosend = [...msgtosend, record];
 
         msgtosend.reverse();
-        
-        fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => {});  
 
-        if ( socket ) socket.write(ENQ);
+        fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => { });
 
-    } catch(ex) {
+        if (socket) socket.write(ENQ);
+
+    } catch (ex) {
         console.log(ex.stack);
     }
 };
 
-const requestInfo = async ( lab_id, socket ) => {
-    
+const requestInfo = async (lab_id, socket) => {
+
     let LabNumber = lab_id.toString().replace(/^0+/, '');
     LabNumber = LabNumber.replace(/^0+/, '');
-	LabNumber = LabNumber.replace(/@/, '');
+    LabNumber = LabNumber.replace(/@/, '');
 
     msgtosend = [];
 
@@ -211,38 +213,38 @@ const requestInfo = async ( lab_id, socket ) => {
     // record    += `Q|1|^${LabNumber}||^^^ALL||||||||X${CR}`;
     // record    += `L|1|${CR}${ETX}`;
 
-   
+
 
     let record = `${STX}1H|\\^&||||||||||P|1${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
-    record    = `${STX}2P|1${CR}${ETX}`;
+    record = `${STX}2P|1${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
-    record    = `${STX}3Q|1|^${LabNumber}||^^^ALL||||||||X${CR}${ETX}`;
+    record = `${STX}3Q|1|^${LabNumber}||^^^ALL||||||||X${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
-    
-    record    = `${STX}4L|1|${CR}${ETX}`;
+
+    record = `${STX}4L|1|${CR}${ETX}`;
     record = record + astm.checksum(record) + `${CR}${LF}`;
     msgtosend = [...msgtosend, record];
 
     msgtosend.reverse();
-    
-    // console.log(msgtosend[0]); 
-    fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => {});  
 
-    if ( socket ) socket.write(ENQ);
+    // console.log(msgtosend[0]); 
+    fileSystem.appendFile('./data/archi_out.txt', msgtosend[0].toString(), err => { });
+
+    if (socket) socket.write(ENQ);
 };
 
-const server = net.createServer( (socket) => {
+const server = net.createServer((socket) => {
     socket.setEncoding();
 
     console.log('Archi client connected to port ' + PORT);
 
-    socket.on ( 'error', err => console.log(`${moment(new Date()).format("YYYY-MM-DD hh:mm:ss")} Archi: Socket error`, err.stack) );
+    socket.on('error', err => console.log(`${moment(new Date()).format("YYYY-MM-DD hh:mm:ss")} Archi: Socket error`, err.stack));
 
 
     let reader = new AstmSocketReader(socket, inDir);
@@ -250,42 +252,70 @@ const server = net.createServer( (socket) => {
 
     // console.log('parser set to value')
 
-    reader.on ( 'data', data => {
+    reader.on('data', data => {
         toRequesition = [];
         parser.parse(data, device);
     });
-    reader.on ( 'enquired', _ => msgtosend = [] );
-    reader.on ( 'negativeacknowledged', _ => msgtosend = [] );
-    reader.on ( 'acknowledged', _ => { 
-        if ( msgtosend.length ) {
+    reader.on('enquired', _ => msgtosend = []);
+    reader.on('negativeacknowledged', _ => msgtosend = []);
+    reader.on('acknowledged', _ => {
+        if (msgtosend.length) {
             let msg = msgtosend.pop();
             console.dir(`sending: ${msg}`.yellow);
             socket.write(msg);
-            fileSystem.appendFile('./data/archi_out.txt', msg.toString(), err => {});  
+            fileSystem.appendFile('./data/archi_out.txt', msg.toString(), err => { });
             // reader.write(msg);
         } else {
             // reader.write(EOT);
             socket.write(EOT);
-            console.log('EOT'.yellow); 
-            
-            if ( toRequesition.length ) {
+            console.log('EOT'.yellow);
+
+            if (toRequesition.length) {
                 let sid = toRequesition.pop();
-                
-                
-                
+
+
+
                 requestMessage(sid, socket);
             }
         }
     });
 
-    parser.on( 'requisition', sid => {
-        console.log(sid+ " to request");
+    parser.on('requisition', sid => {
+        console.log(sid + " to request");
         toRequesition = [...toRequesition, sid]
     });
-    parser.on( 'results', results => saveResult(results) );
-    parser.on( 'startDownload', _ => {
+    parser.on('results', results => {
+        let demoRes = {
+            "sid": "10376",
+            "sampleid": "10376",
+            "devicename": "Archi",
+            "deviceid": 4,
+            "lines": [
+                {
+                    "code": "2010",
+                    "result": "0.81",
+                    "hostcode": "2010",
+                    "parameterId": "2098",
+                    "parameter_id": "2098",
+                    "type_": "F"
+                },
+                {
+                    "code": "2010",
+                    "result": "0.81",
+                    "hostcode": "2010",
+                    "parameterId": "2098",
+                    "parameter_id": "2098",
+                    "type_": "F"
+                }
+            ]
+        }
+        
+        saveResults(device, results);
+        // saveResult(results);
+    });
+    parser.on('startDownload', _ => {
         console.log('startDownload' + JSON.stringify(toRequesition, undefined, 4));
-        if ( toRequesition.length ) {
+        if (toRequesition.length) {
             let sid = toRequesition.pop();
             requestMessage(sid, socket);
         }
@@ -296,13 +326,13 @@ const server = net.createServer( (socket) => {
 
 });
 
-const saveResult = async result  => {
+const saveResult = async result => {
 
-	// if( Math.random() > 0.5 ) return;
+    // if( Math.random() > 0.5 ) return;
 
     try {
 
-        //console.log('saveResult', result);
+
 
         io.emit("e411_result", { data: result });
 
@@ -315,13 +345,13 @@ const saveResult = async result  => {
         let deviceId = device.id;
 
         let userId = config.userId; //10137; // req.params.userId;
-        
+
         let LabNumber = resultList.sampleid;
 
-        for ( let line of resultList.lines ) {
+        for (let line of resultList.lines) {
 
-            let query  = `select * from IPOP_LABORDERS where LabNumber = ${LabNumber} and ParameterID = ${line.parameterId}`;
-            let results = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT});
+            let query = `select * from IPOP_LABORDERS where LabNumber = ${LabNumber} and ParameterID = ${line.parameterId}`;
+            let results = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT });
 
             console.log(query);
 
@@ -331,22 +361,22 @@ const saveResult = async result  => {
 
             line.unit = line.unit || '';
 
-            if ( results.length ) {
+            if (results.length) {
 
                 let PatientType = results[0].PatientType;
                 let OrderID = results[0].OrderID;
                 let TestID = results[0].TestID;
 
 
-                let query  = `select * from Lab_Results where OrderID = ${OrderID} 
+                let query = `select * from Lab_Results where OrderID = ${OrderID} 
                             and LabNumber = ${LabNumber} and ParameterID = ${line.parameterId} and TestID = ${TestID}`;
-                let results2 = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT});
+                let results2 = await sgh.query(query, { type: Sequelize.QueryTypes.SELECT });
 
                 console.log(query);
 
-                if ( !results2.length || 1 ) {
-                    
-                    let query  = `insert into Lab_Results 
+                if (!results2.length || 1) {
+
+                    let query = `insert into Lab_Results 
                     (OrderID, LabNumber, ParameterID, TestID, Result, EquipmentID, UserID, Status, PatientType, UnitName) 
                     values ('${OrderID}', '${LabNumber}', '${line.parameterId}', 
                     '${TestID}', '${line.result}', '${EquipmentID}', '${UserID}', 
@@ -354,15 +384,15 @@ const saveResult = async result  => {
 
                     console.log(query);
 
-                    await sgh.query(query, { type: Sequelize.QueryTypes.INSERT});
-                }             
-            } 
+                    await sgh.query(query, { type: Sequelize.QueryTypes.INSERT });
+                }
+            }
 
         }
-    } catch(ex) {
+    } catch (ex) {
         console.log(ex.stack);
     }
-    
+
 };
 
 exports.start = (io, conn, sghConn) => {
@@ -372,21 +402,21 @@ exports.start = (io, conn, sghConn) => {
 
     server.listen(PORT, () => {
         console.log(`\nArchi host tcp server listening on ${PORT} `.bgRed);
-        
+
         // test(conn, sgh);
-    }); 
+    });
 };
 
 const test = (connection, sgh) => {
 
     let parser = new AstmSocketParser({}, device, connection, sgh);
-    parser.on( 'results', results => saveResult(results) );
-    parser.on( 'requisition', sid => {
-        console.log(sid+ " to request");
+    parser.on('results', results => saveResults(device, result));
+    parser.on('requisition', sid => {
+        console.log(sid + " to request");
         // toRequesition = [...toRequesition, sid]
-        requestMessage ( sid , null, connection, sgh );
+        requestMessage(sid, null, connection, sgh);
     });
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // test data ///////////////////////////////////////////////////////////////////////////////////
     let data = `H|\^&|||ASI^1.0^s/n^H1P1O1R1Q1L1C1|||||My^Host^System||P|1|19930631${CR}`;

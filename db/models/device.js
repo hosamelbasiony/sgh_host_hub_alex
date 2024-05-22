@@ -11,3 +11,6 @@ module.exports = (sequelize, DataTypes) => {
   };
   return unit;
 };
+
+
+// curl -X POST http://localhost:8003/api/devices -H "Content-Type: application/json" -d '{"deviceId":"61","deviceName":"SysmexUrine","deviceImage":""}'
